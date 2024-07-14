@@ -4,6 +4,9 @@
   "description": "Mock SAML is a free SAML 2.0 Identity Provider for testing SAML SSO integrations.",
   "private": true,
   "license": "Apache 2.0",
+  "wfh": {
+    "fork": true
+  },
   "scripts": {
     "dev": "next dev -p 4000",
     "build": "next build",
