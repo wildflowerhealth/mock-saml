@@ -1,16 +1,16 @@
 name: Build and Publish Docker
 
 on:
-  push:
-    branches:
-      - main
-      - release
-    tags:
-      - 'beta-v*'
-  pull_request:
-    # Trigger only for PRs that target main branch
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
+  #     - release
+  #   tags:
+  #     - 'beta-v*'
+  # pull_request:
+  #   # Trigger only for PRs that target main branch
+  #   branches:
+  #     - main
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
