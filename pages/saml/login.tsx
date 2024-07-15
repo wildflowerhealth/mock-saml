@@ -10,7 +10,7 @@ export default function Login() {
   const authUrl = namespace ? `/api/namespace/${namespace}/saml/auth` : '/api/saml/auth';
   const [state, setState] = useState({
     username: 'jackson',
-    domain: 'example.com',
+    domain: 'wfh-test.net',
     acsUrl: 'https://sso.eu.boxyhq.com/api/oauth/saml',
     audience: 'https://saml.boxyhq.com',
   });
@@ -146,6 +146,7 @@ export default function Login() {
                       className='select select-bordered'
                       onChange={handleChange}
                       value={state.domain}>
+                      <option value='wfh-test.net'>@wfh-test.net</option>
                       <option value='example.com'>@example.com</option>
                       <option value='example.org'>@example.org</option>
                     </select>
@@ -173,8 +174,8 @@ export default function Login() {
               <div>
                 <span className='text-sm text-white'>
                   This is a simulated login screen, feel free to pick any username but you are restricted to
-                  two domains example.com and example.org. But this should allow you to test all combinations
-                  of your authentication and user modelling.
+                  three domains wfh-test.net, example.com, and example.org. But this should allow you to test
+                  all combinations of your authentication and user modelling.
                 </span>
               </div>
             </div>
