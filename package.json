@@ -8,7 +8,7 @@
     "fork": true
   },
   "scripts": {
-    "dev": "next dev -p 4000",
+    "dev": "next dev -p 4123",
     "build": "next build",
     "start": "next start -p 4123",
     "lint": "next lint",
