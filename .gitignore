@@ -39,3 +39,4 @@ yarn-error.log*
 key.pem
 public.crt
 .vscode
+.env-backup
