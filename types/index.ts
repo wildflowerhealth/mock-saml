@@ -37,3 +37,14 @@ export type User = {
   firstName: string;
   lastName: string;
 };
+
+export type SydneyUserAttributes = {
+    ProxyID: string;
+    userName: string;
+    userSurname: string;
+    userDateOfBirth: string;
+    UserEmail: string;
+    UserId: string;
+    BrandId: string;
+    EmployerID: string;
+};
