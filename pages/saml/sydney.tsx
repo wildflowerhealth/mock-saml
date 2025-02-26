@@ -10,12 +10,22 @@ export default function Sydney() {
   const { relayState } = router.query;
 
   const authUrl = '/api/saml/auth-sydney';
+
   const [state, setState] = useState({
-    email: 'noah@wildflowerhealth.com',
-    targetEnvironment: 'dev',
-    acsUrl: 'https://app-gateway.dev.wildflowerhealth.net/api/sso/saml/wfhMock',
-    audience: 'com.wildflowerhealth.saml.dev',
-  });
+        email: 'testAnthemSSO@wildflowerhealth.com',
+        targetEnvironment: 'dev',
+        acsUrl: 'https://app-gateway.dev.wildflowerhealth.net/api/sso/saml/wfhMock',
+        audience: 'com.wildflowerhealth.saml.dev',
+    });
+
+    // Wait until after hydration to update the email with timestamp
+    useEffect(() => {
+        const timestamp = Math.floor(Date.now() / 1000);
+        setState(prevState => ({
+            ...prevState,
+            email: `testAnthemSSO+${timestamp}@wildflowerhealth.com`
+        }));
+    }, []);
 
   const emailInp = useRef<HTMLInputElement>(null);
 
