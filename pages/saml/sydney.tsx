@@ -12,7 +12,16 @@ export default function Sydney() {
   const authUrl = '/api/saml/auth-sydney';
 
   const [state, setState] = useState({
+        firstName: 'Marge',
+        lastName: 'Simpson',
+        dob: '01/01/1989',
+        hcid: 'abcdefg',
         email: 'testAnthemSSO@wildflowerhealth.com',
+        proxyId: 'WFPDS123456',
+        brandId: 'ABC',
+        employerId: '993908',
+        stateCode: 'CA',
+        fundingType: 'FullyFunded',
         targetEnvironment: 'dev',
         acsUrl: 'https://app-gateway.dev.wildflowerhealth.net/api/sso/saml/wfhMock',
         audience: 'com.wildflowerhealth.saml.dev',
@@ -23,11 +32,14 @@ export default function Sydney() {
         const timestamp = Math.floor(Date.now() / 1000);
         setState(prevState => ({
             ...prevState,
-            email: `testAnthemSSO+${timestamp}@wildflowerhealth.com`
+            email: `testAnthemSSO+${timestamp}@wildflowerhealth.com`,
+            proxyId: `WFPDS${timestamp}`
         }));
     }, []);
 
   const emailInp = useRef<HTMLInputElement>(null);
+  const firstNameInp = useRef<HTMLInputElement>(null);
+  const lastNameInp = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.currentTarget;
@@ -58,9 +70,7 @@ export default function Sydney() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email,
-        audience: state.audience,
-        acsUrl: state.acsUrl,
+        ...state,
         relayState,
       }),
     });
@@ -89,40 +99,164 @@ export default function Sydney() {
               </h2>
               <form onSubmit={handleSubmit}>
                 <div className='flex flex-col gap-y-3'>
-                <div className='form-control'>
-                    <label className='label'>
-                      <span className='label-text font-bold'>Target WFH Environment</span>
-                    </label>
-                    <select
-                      name='targetEnvironment'
-                      id='targetEnvironment'
-                      className='select select-bordered'
-                      onChange={handleChange}
-                      value={state.targetEnvironment}>
-                      {WfhEnvs.map((env, index) =>  (
-                        <option key={index} value={env}>
-                            {env}
-                        </option>
-                      ))}
-                    </select>
-                  </div>  
-                  <div className='form-control'>
-                    <label className='label'>
-                      <span className='label-text font-bold'>Email</span>
-                    </label>
-                    <input
-                      name='email'
-                      id='email'
-                      ref={emailInp}
-                      autoComplete='off'
-                      type='text'
-                      placeholder='noah@wildflowerhealth.com'
-                      value={state.email}
-                      onChange={handleChange}
-                      className='input input-bordered'
-                      title='Please provide a mock email address'
-                    />
-                  </div>
+                    <div className='form-control'>
+
+                        <label className='label'>
+                        <span className='label-text font-bold'>Target WFH Environment</span>
+                        </label>
+                        <select
+                        name='targetEnvironment'
+                        id='targetEnvironment'
+                        className='select select-bordered'
+                        onChange={handleChange}
+                        value={state.targetEnvironment}>
+                        {WfhEnvs.map((env, index) =>  (
+                            <option key={index} value={env}>
+                                {env}
+                            </option>
+                        ))}
+                        </select>
+                    </div>  
+
+                    <div className='form-control'>
+                        <label className='label'>
+                        <span className='label-text font-bold'>Frist Name</span>
+                        </label>
+                        <input
+                        name='firstName'
+                        id='firstName'
+                        ref={firstNameInp}
+                        autoComplete='off'
+                        type='text'
+                        placeholder='Marge'
+                        value={state.firstName}
+                        onChange={handleChange}
+                        className='input input-bordered'
+                        title='Please provide a mock first name'
+                        />
+                    </div>
+
+                    <div className='form-control'>
+                        <label className='label'>
+                        <span className='label-text font-bold'>Last Name</span>
+                        </label>
+                        <input
+                        name='firstName'
+                        id='firstName'
+                        ref={lastNameInp}
+                        autoComplete='off'
+                        type='text'
+                        placeholder='Simpson'
+                        value={state.lastName}
+                        onChange={handleChange}
+                        className='input input-bordered'
+                        title='Please provide a mock last name'
+                        />
+                    </div>
+
+                    <div className='form-control'>
+                        <label className='label'>
+                        <span className='label-text font-bold'>Email</span>
+                        </label>
+                        <input
+                        name='email'
+                        id='email'
+                        ref={emailInp}
+                        autoComplete='off'
+                        type='text'
+                        placeholder='noah@wildflowerhealth.com'
+                        value={state.email}
+                        onChange={handleChange}
+                        className='input input-bordered'
+                        title='Please provide a mock email address'
+                        />
+                    </div>
+
+                    <div className='form-control'>
+                        <label className='label'>
+                        <span className='label-text font-bold'>Proxy Id</span>
+                        </label>
+                        <input
+                        name='proxyId'
+                        id='proxyId'
+                        autoComplete='off'
+                        type='text'
+                        placeholder='prox1740635124'
+                        value={state.proxyId}
+                        onChange={handleChange}
+                        className='input input-bordered'
+                        title='Please provide a mock proxy Id'
+                        />
+                    </div>
+
+                    <div className='form-control'>
+                        <label className='label'>
+                        <span className='label-text font-bold'>Brand Id</span>
+                        </label>
+                        <input
+                        name='brandId'
+                        id='brandId'
+                        autoComplete='off'
+                        type='text'
+                        placeholder='ABC'
+                        value={state.brandId}
+                        onChange={handleChange}
+                        className='input input-bordered'
+                        title='Please provide a mock brand Id'
+                        />
+                    </div>
+
+
+                    <div className='form-control'>
+                        <label className='label'>
+                        <span className='label-text font-bold'>Employer Id</span>
+                        </label>
+                        <input
+                        name='employerId'
+                        id='employerId'
+                        autoComplete='off'
+                        type='text'
+                        placeholder='993908'
+                        value={state.employerId}
+                        onChange={handleChange}
+                        className='input input-bordered'
+                        title='Please provide a mock employer Id'
+                        />
+                    </div>
+
+                    <div className='form-control'>
+                        <label className='label'>
+                        <span className='label-text font-bold'>State Code</span>
+                        </label>
+                        <input
+                        name='stateCode'
+                        id='stateCode'
+                        autoComplete='off'
+                        type='text'
+                        placeholder='CA'
+                        value={state.stateCode}
+                        onChange={handleChange}
+                        className='input input-bordered'
+                        title='Please provide a mock state code'
+                        />
+                    </div>
+
+                    <div className='form-control'>
+                        <label className='label'>
+                        <span className='label-text font-bold'>Funding Type</span>
+                        </label>
+                        <input
+                        name='fundingType'
+                        id='fundingType'
+                        autoComplete='off'
+                        type='text'
+                        placeholder=''
+                        value={state.fundingType}
+                        onChange={handleChange}
+                        className='input input-bordered'
+                        title='Please provide a mock funding type'
+                        />
+                    </div>
 
                   <button className='btn btn-primary block'>Launch Wildflower</button>
                 </div>
@@ -140,7 +274,7 @@ export default function Sydney() {
                     </button>
                 </div>
                 <pre 
-                    className='bg-gray-100 p-3 rounded text-sm overflow-auto max-h-40 mt-2 cursor-pointer'
+                    className='bg-gray-100 p-3 rounded text-sm overflow-auto max-h-100 mt-2 cursor-pointer'
                     onClick={() => navigator.clipboard.writeText(JSON.stringify(state, null, 2))}
                 >
                     {JSON.stringify(state, null, 2)}
