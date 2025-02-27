@@ -14,15 +14,15 @@ const samlConfigMap: Record<WfhEnv, SamlConfig> = {
     audience: 'com.wildflowerhealth.saml.dev',
   },
   dev: {
-    acs: 'https://anthem.dev.wildflowerhealth.digital/' + acsPath,
+    acs: 'https://anthem.dev.wildflowerhealth.digital' + acsPath,
     audience: 'com.wildflowerhealth.saml.dev',
   },
   stage: {
-    acs: 'https://app-gateway.stage.wildflowerhealth.net' + acsPath,
+    acs: 'https://anthem.stage.wildflowerhealth.digital' + acsPath,
     audience: 'com.wildflowerhealth.saml.staging',
   },
   iat: {
-    acs: 'https://app-gateway.iat.wildflowerhealth.net' + acsPath,
+    acs: 'https://anthem.iat.wildflowerhealth.digital' + acsPath,
     audience: 'com.wildflowerhealth.saml.iat',
   },
   uat: {

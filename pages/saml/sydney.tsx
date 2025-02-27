@@ -22,7 +22,7 @@ export default function Sydney() {
     stateCode: 'CA',
     fundingType: 'FullyFunded',
     targetEnvironment: 'dev',
-    acsUrl: 'https://app-gateway.dev.wildflowerhealth.net/api/sso/saml/wfhMock',
+    acsUrl: 'https://anthem.dev.wildflowerhealth.digital/api/sso/saml/wfhMock',
     audience: 'com.wildflowerhealth.saml.dev',
   });
 
