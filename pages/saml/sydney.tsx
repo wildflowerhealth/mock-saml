@@ -92,8 +92,9 @@ export default function Sydney() {
       </Head>
       <div className='flex min-h-full items-start justify-center p-4'>
         <div className='flex w-full max-w-6xl flex-col md:flex-row gap-6'>
+          {/* Form Container */}
           <div className='w-full md:w-1/2'>
-            <div className='border-2 p-4'>
+            <div className='border-2 p-4 rounded-lg'>
               <h2 className='mb-5 text-center text-2xl font-bold text-gray-900'>Mock Sydney SSO</h2>
               <form onSubmit={handleSubmit}>
                 <div className='flex flex-col gap-y-3'>
@@ -104,7 +105,7 @@ export default function Sydney() {
                     <select
                       name='targetEnvironment'
                       id='targetEnvironment'
-                      className='select select-bordered'
+                      className='select select-bordered w-full'
                       onChange={handleChange}
                       value={state.targetEnvironment}>
                       {WfhEnvs.map((env, index) => (
@@ -115,40 +116,42 @@ export default function Sydney() {
                     </select>
                   </div>
 
-                  <div className='form-control'>
-                    <label className='label'>
-                      <span className='label-text font-bold'>First Name</span>
-                    </label>
-                    <input
-                      name='firstName'
-                      id='firstName'
-                      ref={firstNameInp}
-                      autoComplete='off'
-                      type='text'
-                      placeholder='Marge'
-                      value={state.firstName}
-                      onChange={handleChange}
-                      className='input input-bordered'
-                      title='Please provide a mock first name'
-                    />
-                  </div>
+                  <div className='flex flex-col sm:flex-row gap-3'>
+                    <div className='form-control flex-1'>
+                      <label className='label'>
+                        <span className='label-text font-bold'>First Name</span>
+                      </label>
+                      <input
+                        name='firstName'
+                        id='firstName'
+                        ref={firstNameInp}
+                        autoComplete='off'
+                        type='text'
+                        placeholder='Marge'
+                        value={state.firstName}
+                        onChange={handleChange}
+                        className='input input-bordered w-full'
+                        title='Please provide a mock first name'
+                      />
+                    </div>
 
-                  <div className='form-control'>
-                    <label className='label'>
-                      <span className='label-text font-bold'>Last Name</span>
-                    </label>
-                    <input
-                      name='lastName'
-                      id='lastName'
-                      ref={lastNameInp}
-                      autoComplete='off'
-                      type='text'
-                      placeholder='Simpson'
-                      value={state.lastName}
-                      onChange={handleChange}
-                      className='input input-bordered'
-                      title='Please provide a mock last name'
-                    />
+                    <div className='form-control flex-1'>
+                      <label className='label'>
+                        <span className='label-text font-bold'>Last Name</span>
+                      </label>
+                      <input
+                        name='lastName'
+                        id='lastName'
+                        ref={lastNameInp}
+                        autoComplete='off'
+                        type='text'
+                        placeholder='Simpson'
+                        value={state.lastName}
+                        onChange={handleChange}
+                        className='input input-bordered w-full'
+                        title='Please provide a mock last name'
+                      />
+                    </div>
                   </div>
 
                   <div className='form-control'>
@@ -164,7 +167,7 @@ export default function Sydney() {
                       placeholder='noah@wildflowerhealth.com'
                       value={state.email}
                       onChange={handleChange}
-                      className='input input-bordered'
+                      className='input input-bordered w-full'
                       title='Please provide a mock email address'
                     />
                   </div>
@@ -181,87 +184,93 @@ export default function Sydney() {
                       placeholder='prox1740635124'
                       value={state.proxyId}
                       onChange={handleChange}
-                      className='input input-bordered'
+                      className='input input-bordered w-full'
                       title='Please provide a mock proxy Id'
                     />
                   </div>
 
-                  <div className='form-control'>
-                    <label className='label'>
-                      <span className='label-text font-bold'>Brand Id</span>
-                    </label>
-                    <input
-                      name='brandId'
-                      id='brandId'
-                      autoComplete='off'
-                      type='text'
-                      placeholder='ABC'
-                      value={state.brandId}
-                      onChange={handleChange}
-                      className='input input-bordered'
-                      title='Please provide a mock brand Id'
-                    />
+                  <div className='flex flex-col sm:flex-row gap-3'>
+                    <div className='form-control flex-1'>
+                      <label className='label'>
+                        <span className='label-text font-bold'>Brand Id</span>
+                      </label>
+                      <input
+                        name='brandId'
+                        id='brandId'
+                        autoComplete='off'
+                        type='text'
+                        placeholder='ABC'
+                        value={state.brandId}
+                        onChange={handleChange}
+                        className='input input-bordered w-full'
+                        title='Please provide a mock brand Id'
+                      />
+                    </div>
+
+                    <div className='form-control flex-1'>
+                      <label className='label'>
+                        <span className='label-text font-bold'>Employer Id</span>
+                      </label>
+                      <input
+                        name='employerId'
+                        id='employerId'
+                        autoComplete='off'
+                        type='text'
+                        placeholder='993908'
+                        value={state.employerId}
+                        onChange={handleChange}
+                        className='input input-bordered w-full'
+                        title='Please provide a mock employer Id'
+                      />
+                    </div>
                   </div>
 
-                  <div className='form-control'>
-                    <label className='label'>
-                      <span className='label-text font-bold'>Employer Id</span>
-                    </label>
-                    <input
-                      name='employerId'
-                      id='employerId'
-                      autoComplete='off'
-                      type='text'
-                      placeholder='993908'
-                      value={state.employerId}
-                      onChange={handleChange}
-                      className='input input-bordered'
-                      title='Please provide a mock employer Id'
-                    />
+                  <div className='flex flex-col sm:flex-row gap-3'>
+                    <div className='form-control flex-1'>
+                      <label className='label'>
+                        <span className='label-text font-bold'>State Code</span>
+                      </label>
+                      <input
+                        name='stateCode'
+                        id='stateCode'
+                        autoComplete='off'
+                        type='text'
+                        placeholder='CA'
+                        value={state.stateCode}
+                        onChange={handleChange}
+                        className='input input-bordered w-full'
+                        title='Please provide a mock state code'
+                      />
+                    </div>
+
+                    <div className='form-control flex-1'>
+                      <label className='label'>
+                        <span className='label-text font-bold'>Funding Type</span>
+                      </label>
+                      <input
+                        name='fundingType'
+                        id='fundingType'
+                        autoComplete='off'
+                        type='text'
+                        placeholder=''
+                        value={state.fundingType}
+                        onChange={handleChange}
+                        className='input input-bordered w-full'
+                        title='Please provide a mock funding type'
+                      />
+                    </div>
                   </div>
 
-                  <div className='form-control'>
-                    <label className='label'>
-                      <span className='label-text font-bold'>State Code</span>
-                    </label>
-                    <input
-                      name='stateCode'
-                      id='stateCode'
-                      autoComplete='off'
-                      type='text'
-                      placeholder='CA'
-                      value={state.stateCode}
-                      onChange={handleChange}
-                      className='input input-bordered'
-                      title='Please provide a mock state code'
-                    />
-                  </div>
-
-                  <div className='form-control'>
-                    <label className='label'>
-                      <span className='label-text font-bold'>Funding Type</span>
-                    </label>
-                    <input
-                      name='fundingType'
-                      id='fundingType'
-                      autoComplete='off'
-                      type='text'
-                      placeholder=''
-                      value={state.fundingType}
-                      onChange={handleChange}
-                      className='input input-bordered'
-                      title='Please provide a mock funding type'
-                    />
-                  </div>
-
-                  <button className='btn btn-primary block'>Launch Wildflower</button>
+                  <button className='btn btn-primary block mt-4'>Launch Wildflower</button>
                 </div>
               </form>
             </div>
           </div>
-          <div>
-            <div className='mt-6 pt-6 border-gray-200'>
-              <div className='flex justify-between items-center'>
+
+          {/* JSON Output */}
+          <div className='w-full md:w-1/2'>
+            <div className='border-2 p-4 rounded-lg h-full'>
+              <div className='flex justify-between items-center mb-3'>
                 <h3 className='font-bold text-gray-900'>Current Form Data</h3>
                 <button
                   type='button'
@@ -271,7 +280,7 @@ export default function Sydney() {
                 </button>
               </div>
               <pre
-                className='bg-gray-100 p-3 rounded text-sm overflow-auto max-h-100 mt-2 cursor-pointer'
+                className='bg-gray-100 p-3 rounded text-sm overflow-auto h-[calc(100%-3rem)] mt-2 cursor-pointer'
                 onClick={() => navigator.clipboard.writeText(JSON.stringify(state, null, 2))}>
                 {JSON.stringify(state, null, 2)}
               </pre>
