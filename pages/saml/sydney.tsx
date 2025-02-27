@@ -31,7 +31,7 @@ export default function Sydney() {
   useEffect(() => {
     const timestamp = Math.floor(Date.now() / 100);
     const chance = new Chance();
-    const randomFirstName = chance.first({ gender: 'female'});
+    const randomFirstName = chance.first({ gender: 'female' });
     const randomLastName = chance.last();
     setState((prevState) => ({
       ...prevState,
