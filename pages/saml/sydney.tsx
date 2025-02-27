@@ -6,36 +6,36 @@ import type { FormEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Sydney() {
- const router = useRouter();
+  const router = useRouter();
   const { relayState } = router.query;
 
   const authUrl = '/api/saml/auth-sydney';
 
   const [state, setState] = useState({
-        firstName: 'Marge',
-        lastName: 'Simpson',
-        dob: '01/01/1989',
-        hcid: 'abcdefg',
-        email: 'testAnthemSSO@wildflowerhealth.com',
-        proxyId: 'WFPDS123456',
-        brandId: 'ABC',
-        employerId: '993908',
-        stateCode: 'CA',
-        fundingType: 'FullyFunded',
-        targetEnvironment: 'dev',
-        acsUrl: 'https://app-gateway.dev.wildflowerhealth.net/api/sso/saml/wfhMock',
-        audience: 'com.wildflowerhealth.saml.dev',
-    });
+    firstName: 'Marge',
+    lastName: 'Simpson',
+    dob: '01/01/1989',
+    hcid: 'abcdefg',
+    email: 'testAnthemSSO@wildflowerhealth.com',
+    proxyId: 'WFPDS123456',
+    brandId: 'ABC',
+    employerId: '993908',
+    stateCode: 'CA',
+    fundingType: 'FullyFunded',
+    targetEnvironment: 'dev',
+    acsUrl: 'https://app-gateway.dev.wildflowerhealth.net/api/sso/saml/wfhMock',
+    audience: 'com.wildflowerhealth.saml.dev',
+  });
 
-    // Wait until after hydration to update the email with timestamp
-    useEffect(() => {
-        const timestamp = Math.floor(Date.now() / 1000);
-        setState(prevState => ({
-            ...prevState,
-            email: `testAnthemSSO+${timestamp}@wildflowerhealth.com`,
-            proxyId: `WFPDS${timestamp}`
-        }));
-    }, []);
+  // Wait until after hydration to update the email with timestamp
+  useEffect(() => {
+    const timestamp = Math.floor(Date.now() / 1000);
+    setState((prevState) => ({
+      ...prevState,
+      email: `testAnthemSSO+${timestamp}@wildflowerhealth.com`,
+      proxyId: `WFPDS${timestamp}`,
+    }));
+  }, []);
 
   const emailInp = useRef<HTMLInputElement>(null);
   const firstNameInp = useRef<HTMLInputElement>(null);
@@ -44,19 +44,19 @@ export default function Sydney() {
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.currentTarget;
     console.log(name, value);
-    let newState = {...state};
+    let newState = { ...state };
     if (name === 'targetEnvironment') {
-        const targetEnv = value as unknown as WfhEnv;
-        newState = {
-            ...newState,
-            acsUrl: getSamlConfig(targetEnv).acs,
-            audience: getSamlConfig(targetEnv).audience
-        }
+      const targetEnv = value as unknown as WfhEnv;
+      newState = {
+        ...newState,
+        acsUrl: getSamlConfig(targetEnv).acs,
+        audience: getSamlConfig(targetEnv).audience,
+      };
     }
     setState({
-        ...newState,
-        [name]: value,
-      });
+      ...newState,
+      [name]: value,
+    });
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -90,195 +90,191 @@ export default function Sydney() {
       <Head>
         <title>Mock Syndey Identity Provider </title>
       </Head>
-      <div className='flex min-h-full items-center justify-center'>
-        <div className='flex w-full max-w-xl flex-col px-3'>
-          <div className='space-y-2'>
+      <div className='flex min-h-full items-start justify-center p-4'>
+        <div className='flex w-full max-w-6xl flex-col md:flex-row gap-6'>
+          <div className='w-full md:w-1/2'>
             <div className='border-2 p-4'>
-              <h2 className='mb-5 text-center text-2xl font-bold text-gray-900'>
-                Mock Sydney SSO
-              </h2>
+              <h2 className='mb-5 text-center text-2xl font-bold text-gray-900'>Mock Sydney SSO</h2>
               <form onSubmit={handleSubmit}>
                 <div className='flex flex-col gap-y-3'>
-                    <div className='form-control'>
+                  <div className='form-control'>
+                    <label className='label'>
+                      <span className='label-text font-bold'>Target WFH Environment</span>
+                    </label>
+                    <select
+                      name='targetEnvironment'
+                      id='targetEnvironment'
+                      className='select select-bordered'
+                      onChange={handleChange}
+                      value={state.targetEnvironment}>
+                      {WfhEnvs.map((env, index) => (
+                        <option key={index} value={env}>
+                          {env}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                        <label className='label'>
-                        <span className='label-text font-bold'>Target WFH Environment</span>
-                        </label>
-                        <select
-                        name='targetEnvironment'
-                        id='targetEnvironment'
-                        className='select select-bordered'
-                        onChange={handleChange}
-                        value={state.targetEnvironment}>
-                        {WfhEnvs.map((env, index) =>  (
-                            <option key={index} value={env}>
-                                {env}
-                            </option>
-                        ))}
-                        </select>
-                    </div>  
+                  <div className='form-control'>
+                    <label className='label'>
+                      <span className='label-text font-bold'>First Name</span>
+                    </label>
+                    <input
+                      name='firstName'
+                      id='firstName'
+                      ref={firstNameInp}
+                      autoComplete='off'
+                      type='text'
+                      placeholder='Marge'
+                      value={state.firstName}
+                      onChange={handleChange}
+                      className='input input-bordered'
+                      title='Please provide a mock first name'
+                    />
+                  </div>
 
-                    <div className='form-control'>
-                        <label className='label'>
-                        <span className='label-text font-bold'>Frist Name</span>
-                        </label>
-                        <input
-                        name='firstName'
-                        id='firstName'
-                        ref={firstNameInp}
-                        autoComplete='off'
-                        type='text'
-                        placeholder='Marge'
-                        value={state.firstName}
-                        onChange={handleChange}
-                        className='input input-bordered'
-                        title='Please provide a mock first name'
-                        />
-                    </div>
+                  <div className='form-control'>
+                    <label className='label'>
+                      <span className='label-text font-bold'>Last Name</span>
+                    </label>
+                    <input
+                      name='lastName'
+                      id='lastName'
+                      ref={lastNameInp}
+                      autoComplete='off'
+                      type='text'
+                      placeholder='Simpson'
+                      value={state.lastName}
+                      onChange={handleChange}
+                      className='input input-bordered'
+                      title='Please provide a mock last name'
+                    />
+                  </div>
 
-                    <div className='form-control'>
-                        <label className='label'>
-                        <span className='label-text font-bold'>Last Name</span>
-                        </label>
-                        <input
-                        name='firstName'
-                        id='firstName'
-                        ref={lastNameInp}
-                        autoComplete='off'
-                        type='text'
-                        placeholder='Simpson'
-                        value={state.lastName}
-                        onChange={handleChange}
-                        className='input input-bordered'
-                        title='Please provide a mock last name'
-                        />
-                    </div>
+                  <div className='form-control'>
+                    <label className='label'>
+                      <span className='label-text font-bold'>Email</span>
+                    </label>
+                    <input
+                      name='email'
+                      id='email'
+                      ref={emailInp}
+                      autoComplete='off'
+                      type='text'
+                      placeholder='noah@wildflowerhealth.com'
+                      value={state.email}
+                      onChange={handleChange}
+                      className='input input-bordered'
+                      title='Please provide a mock email address'
+                    />
+                  </div>
 
-                    <div className='form-control'>
-                        <label className='label'>
-                        <span className='label-text font-bold'>Email</span>
-                        </label>
-                        <input
-                        name='email'
-                        id='email'
-                        ref={emailInp}
-                        autoComplete='off'
-                        type='text'
-                        placeholder='noah@wildflowerhealth.com'
-                        value={state.email}
-                        onChange={handleChange}
-                        className='input input-bordered'
-                        title='Please provide a mock email address'
-                        />
-                    </div>
+                  <div className='form-control'>
+                    <label className='label'>
+                      <span className='label-text font-bold'>Proxy Id</span>
+                    </label>
+                    <input
+                      name='proxyId'
+                      id='proxyId'
+                      autoComplete='off'
+                      type='text'
+                      placeholder='prox1740635124'
+                      value={state.proxyId}
+                      onChange={handleChange}
+                      className='input input-bordered'
+                      title='Please provide a mock proxy Id'
+                    />
+                  </div>
 
-                    <div className='form-control'>
-                        <label className='label'>
-                        <span className='label-text font-bold'>Proxy Id</span>
-                        </label>
-                        <input
-                        name='proxyId'
-                        id='proxyId'
-                        autoComplete='off'
-                        type='text'
-                        placeholder='prox1740635124'
-                        value={state.proxyId}
-                        onChange={handleChange}
-                        className='input input-bordered'
-                        title='Please provide a mock proxy Id'
-                        />
-                    </div>
+                  <div className='form-control'>
+                    <label className='label'>
+                      <span className='label-text font-bold'>Brand Id</span>
+                    </label>
+                    <input
+                      name='brandId'
+                      id='brandId'
+                      autoComplete='off'
+                      type='text'
+                      placeholder='ABC'
+                      value={state.brandId}
+                      onChange={handleChange}
+                      className='input input-bordered'
+                      title='Please provide a mock brand Id'
+                    />
+                  </div>
 
-                    <div className='form-control'>
-                        <label className='label'>
-                        <span className='label-text font-bold'>Brand Id</span>
-                        </label>
-                        <input
-                        name='brandId'
-                        id='brandId'
-                        autoComplete='off'
-                        type='text'
-                        placeholder='ABC'
-                        value={state.brandId}
-                        onChange={handleChange}
-                        className='input input-bordered'
-                        title='Please provide a mock brand Id'
-                        />
-                    </div>
+                  <div className='form-control'>
+                    <label className='label'>
+                      <span className='label-text font-bold'>Employer Id</span>
+                    </label>
+                    <input
+                      name='employerId'
+                      id='employerId'
+                      autoComplete='off'
+                      type='text'
+                      placeholder='993908'
+                      value={state.employerId}
+                      onChange={handleChange}
+                      className='input input-bordered'
+                      title='Please provide a mock employer Id'
+                    />
+                  </div>
 
+                  <div className='form-control'>
+                    <label className='label'>
+                      <span className='label-text font-bold'>State Code</span>
+                    </label>
+                    <input
+                      name='stateCode'
+                      id='stateCode'
+                      autoComplete='off'
+                      type='text'
+                      placeholder='CA'
+                      value={state.stateCode}
+                      onChange={handleChange}
+                      className='input input-bordered'
+                      title='Please provide a mock state code'
+                    />
+                  </div>
 
-                    <div className='form-control'>
-                        <label className='label'>
-                        <span className='label-text font-bold'>Employer Id</span>
-                        </label>
-                        <input
-                        name='employerId'
-                        id='employerId'
-                        autoComplete='off'
-                        type='text'
-                        placeholder='993908'
-                        value={state.employerId}
-                        onChange={handleChange}
-                        className='input input-bordered'
-                        title='Please provide a mock employer Id'
-                        />
-                    </div>
-
-                    <div className='form-control'>
-                        <label className='label'>
-                        <span className='label-text font-bold'>State Code</span>
-                        </label>
-                        <input
-                        name='stateCode'
-                        id='stateCode'
-                        autoComplete='off'
-                        type='text'
-                        placeholder='CA'
-                        value={state.stateCode}
-                        onChange={handleChange}
-                        className='input input-bordered'
-                        title='Please provide a mock state code'
-                        />
-                    </div>
-
-                    <div className='form-control'>
-                        <label className='label'>
-                        <span className='label-text font-bold'>Funding Type</span>
-                        </label>
-                        <input
-                        name='fundingType'
-                        id='fundingType'
-                        autoComplete='off'
-                        type='text'
-                        placeholder=''
-                        value={state.fundingType}
-                        onChange={handleChange}
-                        className='input input-bordered'
-                        title='Please provide a mock funding type'
-                        />
-                    </div>
+                  <div className='form-control'>
+                    <label className='label'>
+                      <span className='label-text font-bold'>Funding Type</span>
+                    </label>
+                    <input
+                      name='fundingType'
+                      id='fundingType'
+                      autoComplete='off'
+                      type='text'
+                      placeholder=''
+                      value={state.fundingType}
+                      onChange={handleChange}
+                      className='input input-bordered'
+                      title='Please provide a mock funding type'
+                    />
+                  </div>
 
                   <button className='btn btn-primary block'>Launch Wildflower</button>
                 </div>
               </form>
             </div>
-            <div className='mt-6 pt-6 border-t border-gray-200'>
-                <div className='flex justify-between items-center'>
-                    <h3 className='font-bold text-gray-900'>Current Form Data</h3>
-                    <button 
-                    type="button" 
-                    className="btn btn-xs"
-                    onClick={() => navigator.clipboard.writeText(JSON.stringify(state, null, 2))}
-                    >
-                    Copy
-                    </button>
-                </div>
-                <pre 
-                    className='bg-gray-100 p-3 rounded text-sm overflow-auto max-h-100 mt-2 cursor-pointer'
-                    onClick={() => navigator.clipboard.writeText(JSON.stringify(state, null, 2))}
-                >
-                    {JSON.stringify(state, null, 2)}
-                </pre>
+          </div>
+          <div>
+            <div className='mt-6 pt-6 border-gray-200'>
+              <div className='flex justify-between items-center'>
+                <h3 className='font-bold text-gray-900'>Current Form Data</h3>
+                <button
+                  type='button'
+                  className='btn btn-xs'
+                  onClick={() => navigator.clipboard.writeText(JSON.stringify(state, null, 2))}>
+                  Copy
+                </button>
+              </div>
+              <pre
+                className='bg-gray-100 p-3 rounded text-sm overflow-auto max-h-100 mt-2 cursor-pointer'
+                onClick={() => navigator.clipboard.writeText(JSON.stringify(state, null, 2))}>
+                {JSON.stringify(state, null, 2)}
+              </pre>
             </div>
           </div>
         </div>
