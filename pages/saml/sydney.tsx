@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { FormEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import Chance from 'chance';
 
 export default function Sydney() {
   const router = useRouter();
@@ -26,14 +27,19 @@ export default function Sydney() {
     audience: 'com.wildflowerhealth.saml.dev',
   });
 
-  // Wait until after hydration to update the email with timestamp
+  // Wait until after hydration to randomize initial state
   useEffect(() => {
     const timestamp = Math.floor(Date.now() / 100);
+    const chance = new Chance();
+    const randomFirstName = chance.first({ gender: 'female'});
+    const randomLastName = chance.last();
     setState((prevState) => ({
       ...prevState,
-      email: `testAnthemSSO+${timestamp}@wildflowerhealth.com`,
+      email: `${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`,
       proxyId: `WFPDS${timestamp}`,
       hcid: `SIM${timestamp}`,
+      firstName: randomFirstName,
+      lastName: randomLastName,
     }));
   }, []);
 
