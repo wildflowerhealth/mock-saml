@@ -14,7 +14,7 @@ const samlConfigMap: Record<WfhEnv, SamlConfig> = {
     audience: 'com.wildflowerhealth.saml.dev',
   },
   dev: {
-    acs: 'https://app-gateway.dev.wildflowerhealth.net' + acsPath,
+    acs: 'https://anthem.dev.wildflowerhealth.digital/' + acsPath,
     audience: 'com.wildflowerhealth.saml.dev',
   },
   stage: {
