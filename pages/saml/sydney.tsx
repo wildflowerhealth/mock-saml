@@ -1,5 +1,4 @@
-import { WfhEnv, WfhEnvs } from '@wildflowerhealth/wfh-env';
-import { getSamlConfig } from 'utils/settings';
+import { WfhEnv, WfhEnvs, getSamlConfig } from 'utils/settings';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { FormEvent } from 'react';

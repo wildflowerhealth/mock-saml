@@ -1,4 +1,6 @@
-import { WfhEnv } from '@wildflowerhealth/wfh-env';
+export type WfhEnv = 'local' | 'dev' | 'stage' | 'iat' | 'uat' | 'prod';
+export declare const WfhEnvs: WfhEnv[];
+export declare const wfhEnv: WfhEnv;
 
 interface SamlConfig {
   acs: string;

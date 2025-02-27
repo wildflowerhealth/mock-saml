@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@boxyhq/saml20": "1.5.1",
-    "@wildflowerhealth/wfh-env": "^1.3.0",
     "daisyui": "4.12.10",
     "next": "14.2.5",
     "react": "18.3.1",
