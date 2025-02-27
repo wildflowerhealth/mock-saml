@@ -1,11 +1,11 @@
-import { WfhEnv} from '@wildflowerhealth/wfh-env';
+import { WfhEnv } from '@wildflowerhealth/wfh-env';
 
 interface SamlConfig {
   acs: string;
   audience: string;
 }
 
-const acsPath = '/api/sso/saml/wfhMock'
+const acsPath = '/api/sso/saml/wfhMock';
 
 const samlConfigMap: Record<WfhEnv, SamlConfig> = {
   local: {
@@ -37,7 +37,3 @@ const samlConfigMap: Record<WfhEnv, SamlConfig> = {
 export const getSamlConfig = (env: WfhEnv): SamlConfig => {
   return samlConfigMap[env];
 };
-
-
-
-

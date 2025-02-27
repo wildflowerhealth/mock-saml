@@ -7,20 +7,34 @@ import { getEntityId } from 'lib/entity-id';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { id, audience, acsUrl, relayState, email, firstName, lastName, dob, proxyId, brandId, employerId, stateCode, fundingType } = req.body;
+    const {
+      id,
+      audience,
+      acsUrl,
+      relayState,
+      email,
+      firstName,
+      lastName,
+      dob,
+      proxyId,
+      brandId,
+      employerId,
+      stateCode,
+      fundingType,
+    } = req.body;
     const userId = createHash('sha256').update(email).digest('hex');
 
     const sydneyUserAttributes: SydneyUserAttributes = {
-        UserId: userId,
-        ProxyID: proxyId,
-        userName: firstName,
-        userSurname: lastName,
-        userDateOfBirth: dob,
-        UserEmail: email,
-        BrandId: brandId,
-        EmployerID: employerId,
-        StateCode: stateCode,
-        FundingType: fundingType
+      UserId: userId,
+      ProxyID: proxyId,
+      userName: firstName,
+      userSurname: lastName,
+      userDateOfBirth: dob,
+      UserEmail: email,
+      BrandId: brandId,
+      EmployerID: employerId,
+      StateCode: stateCode,
+      FundingType: fundingType,
     };
     // console.log('Sydney User Attributes', sydneyUserAttributes);
     const xmlSigned = await saml.createSAMLResponse({
@@ -30,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       requestId: id,
       claims: {
         email: email,
-        raw: sydneyUserAttributes
+        raw: sydneyUserAttributes,
       },
       privateKey: config.privateKey,
       publicKey: config.publicKey,

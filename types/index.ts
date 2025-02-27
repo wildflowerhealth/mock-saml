@@ -39,14 +39,14 @@ export type User = {
 };
 
 export type SydneyUserAttributes = {
-    ProxyID: string;
-    userName: string;
-    userSurname: string;
-    userDateOfBirth: string;
-    UserEmail: string;
-    UserId: string;
-    BrandId: string;
-    EmployerID: string;
-    StateCode?: string;
-    FundingType?: string; 
+  ProxyID: string;
+  userName: string;
+  userSurname: string;
+  userDateOfBirth: string;
+  UserEmail: string;
+  UserId: string;
+  BrandId: string;
+  EmployerID: string;
+  StateCode?: string;
+  FundingType?: string;
 };
