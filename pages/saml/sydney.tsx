@@ -314,9 +314,7 @@ export default function Sydney() {
                   Copy
                 </button>
               </div>
-              <pre
-                className='bg-gray-100 p-3 rounded text-sm overflow-auto h-[calc(100%-3rem)] mt-2 cursor-pointer'
-                onClick={() => navigator.clipboard.writeText(JSON.stringify(state, null, 2))}>
+              <pre className='bg-gray-100 p-3 rounded text-sm overflow-auto h-[calc(100%-3rem)] mt-2'>
                 {JSON.stringify(state, null, 2)}
               </pre>
             </div>
