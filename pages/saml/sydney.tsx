@@ -15,7 +15,7 @@ export default function Sydney() {
     firstName: 'Marge',
     lastName: 'Simpson',
     dob: '01/01/1989',
-    hcid: 'abcdefg',
+    hcid: 'SIM333M12345',
     email: 'testAnthemSSO@wildflowerhealth.com',
     proxyId: 'WFPDS123456',
     brandId: 'ABC',
@@ -29,11 +29,12 @@ export default function Sydney() {
 
   // Wait until after hydration to update the email with timestamp
   useEffect(() => {
-    const timestamp = Math.floor(Date.now() / 1000);
+    const timestamp = Math.floor(Date.now() / 100);
     setState((prevState) => ({
       ...prevState,
       email: `testAnthemSSO+${timestamp}@wildflowerhealth.com`,
       proxyId: `WFPDS${timestamp}`,
+      hcid: `SIM${timestamp}`,
     }));
   }, []);
 
@@ -150,6 +151,42 @@ export default function Sydney() {
                         onChange={handleChange}
                         className='input input-bordered w-full'
                         title='Please provide a mock last name'
+                      />
+                    </div>
+                  </div>
+
+                  <div className='flex flex-col sm:flex-row gap-3'>
+                    <div className='form-control flex-1'>
+                      <label className='label'>
+                        <span className='label-text font-bold'>DOB</span>
+                      </label>
+                      <input
+                        name='dob'
+                        id='dob'
+                        autoComplete='off'
+                        type='text'
+                        placeholder='01/01/1989'
+                        value={state.dob}
+                        onChange={handleChange}
+                        className='input input-bordered w-full'
+                        title='Please provide a mock dob'
+                      />
+                    </div>
+
+                    <div className='form-control flex-1'>
+                      <label className='label'>
+                        <span className='label-text font-bold'>HCID</span>
+                      </label>
+                      <input
+                        name='hcid'
+                        id='hcid'
+                        autoComplete='off'
+                        type='text'
+                        placeholder='SIM333M12345'
+                        value={state.hcid}
+                        onChange={handleChange}
+                        className='input input-bordered w-full'
+                        title='Please provide a mock hcid'
                       />
                     </div>
                   </div>
