@@ -8,9 +8,9 @@
     "fork": true
   },
   "scripts": {
-    "dev": "next dev -p 4000",
+    "dev": "next dev -p 4123",
     "build": "next build",
-    "start": "next start -p 4000",
+    "start": "next start -p 4123",
     "lint": "next lint",
     "check-format": "prettier --check .",
     "format": "prettier --write .",
@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@boxyhq/saml20": "1.5.1",
+    "chance": "^1.1.12",
     "daisyui": "4.12.10",
     "next": "14.2.5",
     "react": "18.3.1",
@@ -25,6 +26,7 @@
     "react-gtm-module": "2.0.11"
   },
   "devDependencies": {
+    "@types/chance": "^1.1.6",
     "@types/node": "20.14.10",
     "@types/react": "18.3.3",
     "@types/react-gtm-module": "2.0.3",
