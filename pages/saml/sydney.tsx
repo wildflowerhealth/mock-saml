@@ -44,7 +44,6 @@ export default function Sydney() {
 
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.currentTarget;
-    console.log(name, value);
     let newState = { ...state };
     if (name === 'targetEnvironment') {
       const targetEnv = value as unknown as WfhEnv;

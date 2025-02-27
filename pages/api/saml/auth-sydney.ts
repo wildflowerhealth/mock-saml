@@ -22,8 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         StateCode: stateCode,
         FundingType: fundingType
     };
-    console.log('Sydney User Attributes', sydneyUserAttributes);
-    console.log('audience, acsUrl, id', audience, acsUrl, id)
+    // console.log('Sydney User Attributes', sydneyUserAttributes);
     const xmlSigned = await saml.createSAMLResponse({
       issuer: getEntityId(config.entityId, req.query.namespace as any),
       audience,
