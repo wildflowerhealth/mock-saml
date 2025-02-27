@@ -1,5 +1,5 @@
 export type WfhEnv = 'local' | 'dev' | 'stage' | 'iat' | 'uat' | 'prod';
-export const WfhEnvs: WfhEnv[] = ['local' , 'dev' , 'stage' , 'iat' , 'uat' , 'prod'];
+export const WfhEnvs: WfhEnv[] = ['local', 'dev', 'stage', 'iat', 'uat', 'prod'];
 
 interface SamlConfig {
   acs: string;
