@@ -6,20 +6,20 @@ import { useEffect, useRef, useState, ChangeEvent } from 'react';
 import Chance from 'chance';
 
 type FormState = {
-    firstName: string;
-    lastName: string;
-    dob: string;
-    hcid: string;
-    email: string;
-    proxyId: string;
-    brandId: string;
-    employerId: string;
-    stateCode: string;
-    fundingType: string;
-    targetEnvironment: WfhEnv;
-    acsUrl: string;
-    audience: string;
-}
+  firstName: string;
+  lastName: string;
+  dob: string;
+  hcid: string;
+  email: string;
+  proxyId: string;
+  brandId: string;
+  employerId: string;
+  stateCode: string;
+  fundingType: string;
+  targetEnvironment: WfhEnv;
+  acsUrl: string;
+  audience: string;
+};
 
 export default function Sydney() {
   const router = useRouter();
@@ -49,7 +49,7 @@ export default function Sydney() {
   // init jsonText state from initial form state
   useEffect(() => {
     setJsonText(JSON.stringify(state, null, 2));
-  }, [])
+  }, []);
 
   // Wait until after hydration to randomize initial state
   useEffect(() => {
@@ -58,17 +58,17 @@ export default function Sydney() {
     const randomFirstName = chance.first({ gender: 'female' });
     const randomLastName = chance.last();
     setState((prevState) => {
-        const newState = {
-            ...prevState,
-            email: `${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`,
-            proxyId: `WFPDS${timestamp}`,
-            hcid: `SIM${timestamp}`,
-            firstName: randomFirstName,
-            lastName: randomLastName,
-        }  
-        // also, update jsonText to match
-        setJsonText(JSON.stringify(newState, null, 2));
-        return newState;
+      const newState = {
+        ...prevState,
+        email: `${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`,
+        proxyId: `WFPDS${timestamp}`,
+        hcid: `SIM${timestamp}`,
+        firstName: randomFirstName,
+        lastName: randomLastName,
+      };
+      // also, update jsonText to match
+      setJsonText(JSON.stringify(newState, null, 2));
+      return newState;
     });
   }, []);
 
@@ -101,43 +101,47 @@ export default function Sydney() {
     setJsonText(newJsonText);
 
     try {
-        const parsedJson = JSON.parse(newJsonText);
+      const parsedJson = JSON.parse(newJsonText);
 
-        // validate parsed json
-        if (typeof parsedJson === 'object' && parsedJson !== null) {
-            // use current state for any un-supplied properties in json
-            const newState = { ...state }
+      // validate parsed json
+      if (typeof parsedJson === 'object' && parsedJson !== null) {
+        // use current state for any un-supplied properties in json
+        const newState = { ...state };
 
-            // update only props that exist in the json
-            Object.keys(state).forEach(key => {
-                if (key in parsedJson && typeof parsedJson[key] !== 'undefined') {
-                    newState[key as keyof FormState] = parsedJson[key];
-                }
-            })
+        // update only props that exist in the json
+        Object.keys(state).forEach((key) => {
+          if (key in parsedJson && typeof parsedJson[key] !== 'undefined') {
+            newState[key as keyof FormState] = parsedJson[key];
+          }
+        });
 
-            // update targetEnvironment dependents 
-            if ('targetEnvironment' in parsedJson && typeof parsedJson.targetEnvironment === 'string' && WfhEnvs.includes(parsedJson.targetEnvironment as WfhEnv) ) {
-                const targetEnv = parsedJson.targetEnvironment as WfhEnv;
-                newState.targetEnvironment = targetEnv;
+        // update targetEnvironment dependents
+        if (
+          'targetEnvironment' in parsedJson &&
+          typeof parsedJson.targetEnvironment === 'string' &&
+          WfhEnvs.includes(parsedJson.targetEnvironment as WfhEnv)
+        ) {
+          const targetEnv = parsedJson.targetEnvironment as WfhEnv;
+          newState.targetEnvironment = targetEnv;
 
-                // only update ACS and audience if they weren't set in the JSON
-                if (!('acsUrl' in parsedJson)) {
-                    newState.acsUrl = getSamlConfig(targetEnv).acs;
-                }
-                if (!('audience' in parsedJson)) {
-                    newState.audience = getSamlConfig(targetEnv).audience;
-                }
-            }
-
-            setState(newState);
-            setJsonError(null);
-        } else {
-            setJsonError('JSON must be an object');
+          // only update ACS and audience if they weren't set in the JSON
+          if (!('acsUrl' in parsedJson)) {
+            newState.acsUrl = getSamlConfig(targetEnv).acs;
+          }
+          if (!('audience' in parsedJson)) {
+            newState.audience = getSamlConfig(targetEnv).audience;
+          }
         }
+
+        setState(newState);
+        setJsonError(null);
+      } else {
+        setJsonError('JSON must be an object');
+      }
     } catch (e) {
-        setJsonError('Invalid JSON format');
+      setJsonError('Invalid JSON format');
     }
-  } 
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -394,7 +398,7 @@ export default function Sydney() {
                 </button>
               </div>
               <textarea
-                ref={jsonTextAreaRef} 
+                ref={jsonTextAreaRef}
                 className='w-full bg-gray-100 p-3 rounded text-sm font-mono h-[calc(100%-3rem)] mt-2'
                 value={jsonText}
                 onChange={handleJsonChange}
