@@ -2,8 +2,24 @@ import { WfhEnv, WfhEnvs, getSamlConfig } from 'utils/settings';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { FormEvent } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, ChangeEvent } from 'react';
 import Chance from 'chance';
+
+type FormState = {
+    firstName: string;
+    lastName: string;
+    dob: string;
+    hcid: string;
+    email: string;
+    proxyId: string;
+    brandId: string;
+    employerId: string;
+    stateCode: string;
+    fundingType: string;
+    targetEnvironment: WfhEnv;
+    acsUrl: string;
+    audience: string;
+}
 
 export default function Sydney() {
   const router = useRouter();
@@ -11,7 +27,7 @@ export default function Sydney() {
 
   const authUrl = '/api/saml/auth-sydney';
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<FormState>({
     firstName: 'Marge',
     lastName: 'Simpson',
     dob: '01/01/1989',
@@ -22,10 +38,18 @@ export default function Sydney() {
     employerId: '993908',
     stateCode: 'CA',
     fundingType: 'FullyFunded',
-    targetEnvironment: 'dev',
+    targetEnvironment: 'dev' as WfhEnv,
     acsUrl: 'https://anthem.dev.wildflowerhealth.digital/api/sso/saml/wfhMock',
     audience: 'com.wildflowerhealth.saml.dev',
   });
+
+  const [jsonText, setJsonText] = useState<string>('');
+  const [jsonError, setJsonError] = useState<string | null>(null);
+
+  // init jsonText state from initial form state
+  useEffect(() => {
+    setJsonText(JSON.stringify(state, null, 2));
+  }, [])
 
   // Wait until after hydration to randomize initial state
   useEffect(() => {
@@ -33,19 +57,25 @@ export default function Sydney() {
     const chance = new Chance();
     const randomFirstName = chance.first({ gender: 'female' });
     const randomLastName = chance.last();
-    setState((prevState) => ({
-      ...prevState,
-      email: `${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`,
-      proxyId: `WFPDS${timestamp}`,
-      hcid: `SIM${timestamp}`,
-      firstName: randomFirstName,
-      lastName: randomLastName,
-    }));
+    setState((prevState) => {
+        const newState = {
+            ...prevState,
+            email: `${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`,
+            proxyId: `WFPDS${timestamp}`,
+            hcid: `SIM${timestamp}`,
+            firstName: randomFirstName,
+            lastName: randomLastName,
+        }  
+        // also, update jsonText to match
+        setJsonText(JSON.stringify(newState, null, 2));
+        return newState;
+    });
   }, []);
 
   const emailInp = useRef<HTMLInputElement>(null);
   const firstNameInp = useRef<HTMLInputElement>(null);
   const lastNameInp = useRef<HTMLInputElement>(null);
+  const jsonTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.currentTarget;
@@ -62,12 +92,55 @@ export default function Sydney() {
       ...newState,
       [name]: value,
     });
+
+    setJsonText(JSON.stringify(newState, null, 2));
   };
+
+  const handleJsonChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
+    const newJsonText = e.target.value;
+    setJsonText(newJsonText);
+
+    try {
+        const parsedJson = JSON.parse(newJsonText);
+
+        // validate parsed json
+        if (typeof parsedJson === 'object' && parsedJson !== null) {
+            // use current state for any un-supplied properties in json
+            const newState = { ...state }
+
+            // update only props that exist in the json
+            Object.keys(state).forEach(key => {
+                if (key in parsedJson && typeof parsedJson[key] !== 'undefined') {
+                    newState[key as keyof FormState] = parsedJson[key];
+                }
+            })
+
+            // update targetEnvironment dependents 
+            if ('targetEnvironment' in parsedJson && typeof parsedJson.targetEnvironment === 'string' && WfhEnvs.includes(parsedJson.targetEnvironment as WfhEnv) ) {
+                const targetEnv = parsedJson.targetEnvironment as WfhEnv;
+                newState.targetEnvironment = targetEnv;
+
+                // only update ACS and audience if they weren't set in the JSON
+                if (!('acsUrl' in parsedJson)) {
+                    newState.acsUrl = getSamlConfig(targetEnv).acs;
+                }
+                if (!('audience' in parsedJson)) {
+                    newState.audience = getSamlConfig(targetEnv).audience;
+                }
+            }
+
+            setState(newState);
+            setJsonError(null);
+        } else {
+            setJsonError('JSON must be an object');
+        }
+    } catch (e) {
+        setJsonError('Invalid JSON format');
+    }
+  } 
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const { email } = state;
 
     const response = await fetch(authUrl, {
       method: 'POST',
@@ -320,9 +393,13 @@ export default function Sydney() {
                   Copy
                 </button>
               </div>
-              <pre className='bg-gray-100 p-3 rounded text-sm overflow-auto h-[calc(100%-3rem)] mt-2'>
-                {JSON.stringify(state, null, 2)}
-              </pre>
+              <textarea
+                ref={jsonTextAreaRef} 
+                className='w-full bg-gray-100 p-3 rounded text-sm font-mono h-[calc(100%-3rem)] mt-2'
+                value={jsonText}
+                onChange={handleJsonChange}
+                style={{ resize: 'none' }}
+              />
             </div>
           </div>
         </div>
