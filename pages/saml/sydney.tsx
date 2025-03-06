@@ -84,6 +84,7 @@ export default function Sydney() {
       const targetEnv = value as unknown as WfhEnv;
       newState = {
         ...newState,
+        targetEnvironment: targetEnv,
         acsUrl: getSamlConfig(targetEnv).acs,
         audience: getSamlConfig(targetEnv).audience,
       };
