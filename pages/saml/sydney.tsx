@@ -52,6 +52,7 @@ export default function Sydney() {
   }, []);
 
   // Wait until after hydration to randomize initial state
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const timestamp = Math.floor(Date.now() / 100);
     const chance = new Chance();
@@ -70,7 +71,7 @@ export default function Sydney() {
       setJsonText(JSON.stringify(newState, null, 2));
       return newState;
     });
-  }, []);
+  }, []); // Empty array ensures this runs only once on mount
 
   const emailInp = useRef<HTMLInputElement>(null);
   const firstNameInp = useRef<HTMLInputElement>(null);
