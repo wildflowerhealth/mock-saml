@@ -26,11 +26,11 @@ const samlConfigMap: Record<WfhEnv, SamlConfig> = {
     audience: 'com.wildflowerhealth.saml.iat',
   },
   uat: {
-    acs: 'https://app-gateway.uat.wildflowerhealth.net' + acsPath,
+    acs: 'https://anthem.uat.wildflowerhealth.digital' + acsPath,
     audience: 'com.wildflowerhealth.saml.uat',
   },
   prod: {
-    acs: 'https://app-gateway.prod.wildflowerhealth.net' + acsPath,
+    acs: 'https://anthem.prod.wildflowerhealth.digital' + acsPath,
     audience: 'com.wildflowerhealth.saml.production',
   },
 };
