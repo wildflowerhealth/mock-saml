@@ -21,11 +21,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       employerId,
       stateCode,
       fundingType,
+      hcid,
     } = req.body;
-    const userId = createHash('sha256').update(email).digest('hex');
 
     const sydneyUserAttributes: SydneyUserAttributes = {
-      UserId: userId,
+      UserId: hcid,
       ProxyID: proxyId,
       userName: firstName,
       userSurname: lastName,
