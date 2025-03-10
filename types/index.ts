@@ -47,6 +47,6 @@ export type SydneyUserAttributes = {
   UserId: string;
   BrandId: string;
   EmployerID: string;
-  StateCode?: string;
-  FundingType?: string;
+  code?: string;
+  fundgTypeCd?: string;
 };
