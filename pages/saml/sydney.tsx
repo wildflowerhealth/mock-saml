@@ -37,7 +37,7 @@ export default function Sydney() {
     brandId: 'ABC',
     employerId: '993908',
     stateCode: 'CA',
-    fundingType: 'FullyFunded',
+    fundingType: 'FI',
     targetEnvironment: 'dev' as WfhEnv,
     acsUrl: 'https://anthem.dev.wildflowerhealth.digital/api/sso/saml/wfhMock',
     audience: 'com.wildflowerhealth.saml.dev',
