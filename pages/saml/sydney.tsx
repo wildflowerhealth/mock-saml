@@ -80,22 +80,24 @@ export default function Sydney() {
 
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.currentTarget;
-    let newState = { ...state };
+    let updatedState = { ...state };
     if (name === 'targetEnvironment') {
       const targetEnv = value as unknown as WfhEnv;
-      newState = {
-        ...newState,
+      updatedState = {
+        ...updatedState,
         targetEnvironment: targetEnv,
         acsUrl: getSamlConfig(targetEnv).acs,
         audience: getSamlConfig(targetEnv).audience,
       };
+    } else {
+        updatedState = {
+            ...updatedState,
+            [name]: value
+        }
     }
-    setState({
-      ...newState,
-      [name]: value,
-    });
+    setState(updatedState);
 
-    setJsonText(JSON.stringify(newState, null, 2));
+    setJsonText(JSON.stringify(updatedState, null, 2));
   };
 
   const handleJsonChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
