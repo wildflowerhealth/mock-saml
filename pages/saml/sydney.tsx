@@ -90,10 +90,10 @@ export default function Sydney() {
         audience: getSamlConfig(targetEnv).audience,
       };
     } else {
-        updatedState = {
-            ...updatedState,
-            [name]: value
-        }
+      updatedState = {
+        ...updatedState,
+        [name]: value,
+      };
     }
     setState(updatedState);
 
