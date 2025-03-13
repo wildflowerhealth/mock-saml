@@ -33,8 +33,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       UserEmail: email,
       BrandId: brandId,
       EmployerID: employerId,
-      code: stateCode,
-      fundgTypeCd: fundingType,
+      UnderWritingStateCd: stateCode,
+      FundgTypeCd: fundingType,
     };
     // console.log('Sydney User Attributes', sydneyUserAttributes);
     const xmlSigned = await saml.createSAMLResponse({
