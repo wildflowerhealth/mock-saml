@@ -22,8 +22,8 @@ type FormState = {
 };
 
 function removeSpacesAndApostrophes(str: string): string {
-    return str.replace(/[ ']/g, '');
-  }
+  return str.replace(/[ ']/g, '');
+}
 
 export default function Sydney() {
   const router = useRouter();
@@ -62,7 +62,9 @@ export default function Sydney() {
     const chance = new Chance();
     const randomFirstName = chance.first({ gender: 'female' });
     const randomLastName = chance.last();
-    const email = removeSpacesAndApostrophes(`${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`).toLowerCase();
+    const email = removeSpacesAndApostrophes(
+      `${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`
+    ).toLowerCase();
     setState((prevState) => {
       const newState = {
         ...prevState,
