@@ -21,6 +21,10 @@ type FormState = {
   audience: string;
 };
 
+function removeNonAlphanumeric(str: string): string {
+    return str.replace(/[^\p{L}\p{N}]/gu, '');
+}
+
 export default function Sydney() {
   const router = useRouter();
   const { relayState } = router.query;
@@ -58,10 +62,11 @@ export default function Sydney() {
     const chance = new Chance();
     const randomFirstName = chance.first({ gender: 'female' });
     const randomLastName = chance.last();
+    const email = removeNonAlphanumeric(`${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`).toLowerCase();
     setState((prevState) => {
       const newState = {
         ...prevState,
-        email: `${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`,
+        email,
         proxyId: `WFPDS${timestamp}`,
         hcid: `SIM${timestamp}`,
         firstName: randomFirstName,
