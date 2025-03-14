@@ -21,9 +21,9 @@ type FormState = {
   audience: string;
 };
 
-function removeNonAlphanumeric(str: string): string {
-    return str.replace(/[^\p{L}\p{N}]/gu, '');
-}
+function removeSpacesAndApostrophes(str: string): string {
+    return str.replace(/[ ']/g, '');
+  }
 
 export default function Sydney() {
   const router = useRouter();
@@ -62,7 +62,7 @@ export default function Sydney() {
     const chance = new Chance();
     const randomFirstName = chance.first({ gender: 'female' });
     const randomLastName = chance.last();
-    const email = removeNonAlphanumeric(`${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`).toLowerCase();
+    const email = removeSpacesAndApostrophes(`${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`).toLowerCase();
     setState((prevState) => {
       const newState = {
         ...prevState,
