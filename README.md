@@ -80,8 +80,8 @@ Please try to create bug reports that are:
 - [Twitter](https://twitter.com/BoxyHQ) (Follow us)
 - [GitHub Issues](https://https://github.com/boxyhq/mock-saml/issues) (Contributions, report issues and product ideas)
 
-
 # Mock SAML Sydney
+
 ```
 baseUrl/saml/sydney
 ```
