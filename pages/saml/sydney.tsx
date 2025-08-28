@@ -54,7 +54,7 @@ export default function Sydney() {
   // init jsonText state from initial form state
   useEffect(() => {
     setJsonText(JSON.stringify(state, null, 2));
-  }, []);
+  }, [state]);
 
   // Wait until after hydration to randomize initial state
   // eslint-disable-next-line react-hooks/exhaustive-deps
