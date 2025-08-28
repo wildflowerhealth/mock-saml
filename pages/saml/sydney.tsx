@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import type { FormEvent } from 'react';
 import { useEffect, useRef, useState, ChangeEvent } from 'react';
 import Chance from 'chance';
+import Link from 'next/link';
 
 type FormState = {
   firstName: string;
@@ -168,6 +169,15 @@ export default function Sydney() {
       }),
     });
 
+      // If API says "requiresAuth", bounce straight to GitHub OAuth
+      if (response.status === 401) {
+        const data = await response.json();
+        if (data?.requiresAuth && data?.signInUrl) {
+          window.location.href = data.signInUrl;
+          return;
+        }
+      }
+
     if (response.ok) {
       const newDoc = document.open('text/html', 'replace');
 
@@ -178,13 +188,34 @@ export default function Sydney() {
     }
   };
 
+
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    fetch("/api/session")
+      .then((r) => r.json())
+      .then((data) => setSession(data.session));
+  }, []);
+
+
   return (
     <>
       <Head>
         <title>Mock Syndey Identity Provider </title>
       </Head>
+      <div className='flex items-start justify-center p-4'>
+        {session ? (
+            <>
+              <span>Welcome @{session.login}</span>&nbsp;&nbsp;
+              <Link href="/api/gh/logout">Logout</Link>
+            </>
+          ) : (
+            <Link href="/api/gh/login">Login with GitHub</Link>
+        )}
+      </div>
       <div className='flex min-h-full items-start justify-center p-4'>
         <div className='flex w-full max-w-6xl flex-col md:flex-row gap-6'>
+          
           {/* Form Container */}
           <div className='w-full md:w-1/2'>
             <div className='border-2 p-4 rounded-lg'>
