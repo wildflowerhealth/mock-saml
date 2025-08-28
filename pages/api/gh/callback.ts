@@ -3,8 +3,9 @@ import { encodeSession, makeSessionCookie, clearSessionCookie } from "../../../l
 
 const CLIENT_ID = process.env.GITHUB_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET!;
-const REQUIRED_ORG = process.env.GITHUB_REQUIRED_ORG!;
 const APP_URL = process.env.APP_URL!;
+
+const REQUIRED_ORG = 'wildflowerhealth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { code, state } = req.query;
