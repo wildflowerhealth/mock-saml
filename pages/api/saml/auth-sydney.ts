@@ -1,4 +1,3 @@
-
 import config from 'lib/env';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { SydneyUserAttributes } from 'types';
@@ -7,8 +6,8 @@ import { getEntityId } from 'lib/entity-id';
 import { getSessionFromReq } from 'lib/session-api';
 
 const isProdDestination = (acsUrl: string) => {
-  return acsUrl === 'https://anthem.buildinghealthyfamilies.ai/api/sso/saml/wfhMock'
-}
+  return acsUrl === 'https://anthem.buildinghealthyfamilies.ai/api/sso/saml/wfhMock';
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -19,16 +18,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const sess = getSessionFromReq(req);
     if (!sess) {
       // bounce to GitHub OAuth; after it completes, user returns here via "next"
-      const referer = (req.headers.referer as string) || "/";
+      const referer = (req.headers.referer as string) || '/';
       const next = encodeURIComponent(referer);
       return res.status(401).json({
         ok: false,
         requiresAuth: true,
-        signInUrl: `/api/gh/login?next=${next}`
+        signInUrl: `/api/gh/login?next=${next}`,
       });
     }
   }
-  
+
   const {
     id,
     audience,
