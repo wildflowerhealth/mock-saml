@@ -1,10 +1,11 @@
 import { WfhEnv, WfhEnvs, getSamlConfig } from 'utils/settings';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import type { FormEvent } from 'react';
-import { useEffect, useRef, useState, ChangeEvent } from 'react';
+import { useEffect, useRef, useState, ChangeEvent, useMemo, FormEvent } from 'react';
 import Chance from 'chance';
 import Link from 'next/link';
+import ToggleButton from 'components/ToggleButton';
+import MockEligibility from 'components/MockEligibility';
 
 type FormState = {
   firstName: string;
@@ -85,6 +86,7 @@ export default function Sydney() {
   const firstNameInp = useRef<HTMLInputElement>(null);
   const lastNameInp = useRef<HTMLInputElement>(null);
   const jsonTextAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [showMockForm, setShowMockForm] = useState(false);
 
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.currentTarget;
@@ -188,7 +190,28 @@ export default function Sydney() {
     }
   };
 
+  const mockEligibilityInitData = useMemo(
+    () => ({
+      firstName: state.firstName,
+      lastName: state.lastName,
+      dob: state.dob,
+      hcid: state.hcid,
+      email: state.email,
+      proxyId: state.proxyId,
+      brandId: state.brandId,
+      employerId: state.employerId,
+      stateCode: state.stateCode,
+      fundingType: state.fundingType,
+      targetEnvironment: state.targetEnvironment,
+    }),
+    [state]
+  );
+
   const [session, setSession] = useState<any>(null);
+  const allowMockEligibilitySection = !['prod', 'uat'].includes(state.targetEnvironment);
+  useEffect(() => {
+    setShowMockForm(false);
+  }, [allowMockEligibilitySection]);
 
   useEffect(() => {
     fetch('/api/session')
@@ -217,6 +240,15 @@ export default function Sydney() {
           <div className='w-full md:w-1/2'>
             <div className='border-2 p-4 rounded-lg'>
               <h2 className='mb-5 text-center text-2xl font-bold text-gray-900'>Mock Sydney SSO</h2>
+              <div className='flex justify-end'>
+                {allowMockEligibilitySection && (
+                  <ToggleButton
+                    checked={showMockForm}
+                    onChange={setShowMockForm}
+                    label='Use Mock Eligibility'
+                  />
+                )}
+              </div>
               <form onSubmit={handleSubmit}>
                 <div className='flex flex-col gap-y-3'>
                   <div className='form-control'>
@@ -424,6 +456,9 @@ export default function Sydney() {
                 </div>
               </form>
             </div>
+            {allowMockEligibilitySection && showMockForm && (
+              <MockEligibility SSOFromData={mockEligibilityInitData} />
+            )}
           </div>
 
           {/* JSON Output */}
