@@ -3,6 +3,7 @@ export const WfhEnvs: WfhEnv[] = ['local', 'dev', 'stage', 'iat', 'uat', 'prod']
 
 interface SamlConfig {
   acs: string;
+  acsOldWebAppDomain?: string; // actually called new-app by the EU team, the RN app is the replacement for the old web app
   audience: string;
   mockEligibility?: string;
   agApiKey?: string;
@@ -20,18 +21,21 @@ const samlConfigMap: Record<WfhEnv, SamlConfig> = {
   },
   dev: {
     acs: 'https://anthem.dev.wildflowerhealth.digital' + acsPath,
+    acsOldWebAppDomain: 'https://anthem-new-app.dev.wildflowerhealth.digital' + acsPath,
     audience: 'com.wildflowerhealth.saml.dev',
     mockEligibility: 'https://anthem.dev.wildflowerhealth.digital' + mockEligibilityPath,
     agApiKey: process.env.AG_API_KEY ?? 'e020b2a6-30af-46f6-9524-c33dc0598461',
   },
   stage: {
     acs: 'https://anthem.stage.wildflowerhealth.digital' + acsPath,
+    acsOldWebAppDomain: 'https://anthem-new-app.stage.wildflowerhealth.digital' + acsPath,
     audience: 'com.wildflowerhealth.saml.staging',
     mockEligibility: 'https://anthem.stage.wildflowerhealth.digital' + mockEligibilityPath,
     agApiKey: process.env.AG_API_KEY ?? 'e020b2a6-30af-46f6-9524-c33dc0598461',
   },
   iat: {
     acs: 'https://anthem.iat.wildflowerhealth.digital' + acsPath,
+    acsOldWebAppDomain: 'https://anthem-new-app.iat.wildflowerhealth.digital' + acsPath,
     audience: 'com.wildflowerhealth.saml.iat',
     mockEligibility: 'https://anthem.iat.wildflowerhealth.digital' + mockEligibilityPath,
     agApiKey: process.env.AG_API_KEY ?? 'e020b2a6-30af-46f6-9524-c33dc0598461',

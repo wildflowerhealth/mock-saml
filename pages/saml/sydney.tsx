@@ -32,6 +32,7 @@ export default function Sydney() {
   const { relayState } = router.query;
 
   const authUrl = '/api/saml/auth-sydney';
+  const initialTargetEnv = 'dev' as WfhEnv;
 
   const [state, setState] = useState<FormState>({
     firstName: 'Marge',
@@ -44,9 +45,9 @@ export default function Sydney() {
     employerId: '993908',
     stateCode: 'CA',
     fundingType: 'FI',
-    targetEnvironment: 'dev' as WfhEnv,
-    acsUrl: 'https://anthem.dev.wildflowerhealth.digital/api/sso/saml/wfhMock',
-    audience: 'com.wildflowerhealth.saml.dev',
+    targetEnvironment: initialTargetEnv,
+    acsUrl: getSamlConfig(initialTargetEnv).acs,
+    audience: getSamlConfig(initialTargetEnv).audience,
   });
 
   const [jsonText, setJsonText] = useState<string>('');
@@ -87,6 +88,7 @@ export default function Sydney() {
   const lastNameInp = useRef<HTMLInputElement>(null);
   const jsonTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const [showMockForm, setShowMockForm] = useState(false);
+  const [useReactNative, setUseReactNative] = useState(false);
 
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.currentTarget;
@@ -160,15 +162,21 @@ export default function Sydney() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // if useReactNative is set, and there is an acsReactNative URL for the target env, use that
+    let body: Record<string, any> = { ...state, relayState: relayState ?? '' };
+    if (useReactNative) {
+      const acsOldWebAppDomain = getSamlConfig(state.targetEnvironment).acsOldWebAppDomain;
+      if (acsOldWebAppDomain) {
+        body = { ...state, acsUrl: acsOldWebAppDomain };
+      }
+    }
+
     const response = await fetch(authUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        ...state,
-        relayState,
-      }),
+      body: JSON.stringify(body),
     });
 
     // If API says "requiresAuth", bounce straight to GitHub OAuth
@@ -208,10 +216,16 @@ export default function Sydney() {
   );
 
   const [session, setSession] = useState<any>(null);
+
   const allowMockEligibilitySection = !['prod', 'uat'].includes(state.targetEnvironment);
   useEffect(() => {
     setShowMockForm(false);
   }, [allowMockEligibilitySection]);
+
+  const allowUseReactNativeToggle = !['prod', 'uat'].includes(state.targetEnvironment);
+  useEffect(() => {
+    setUseReactNative(false);
+  }, [allowUseReactNativeToggle]);
 
   useEffect(() => {
     fetch('/api/session')
@@ -240,12 +254,19 @@ export default function Sydney() {
           <div className='w-full md:w-1/2'>
             <div className='border-2 p-4 rounded-lg'>
               <h2 className='mb-5 text-center text-2xl font-bold text-gray-900'>Mock Sydney SSO</h2>
-              <div className='flex justify-end'>
+              <div className='flex justify-center gap-4 mb-4'>
                 {allowMockEligibilitySection && (
                   <ToggleButton
                     checked={showMockForm}
                     onChange={setShowMockForm}
                     label='Use Mock Eligibility'
+                  />
+                )}
+                {allowUseReactNativeToggle && (
+                  <ToggleButton
+                    checked={useReactNative}
+                    onChange={setUseReactNative}
+                    label='Use React Native App'
                   />
                 )}
               </div>
