@@ -164,10 +164,10 @@ export default function Sydney() {
 
     // if useReactNative is set, and there is an acsReactNative URL for the target env, use that
     let body: Record<string, any> = { ...state, relayState: relayState ?? '' };
-    if (useReactNative) {
-      const acsOldWebAppDomain = getSamlConfig(state.targetEnvironment).acsOldWebAppDomain;
-      if (acsOldWebAppDomain) {
-        body = { ...state, acsUrl: acsOldWebAppDomain };
+    if (!useReactNative) {
+      const acsCordovaWebAppDomain = getSamlConfig(state.targetEnvironment).acsCordovaWebAppDomain;
+      if (acsCordovaWebAppDomain) {
+        body = { ...state, acsUrl: acsCordovaWebAppDomain };
       }
     }
 
