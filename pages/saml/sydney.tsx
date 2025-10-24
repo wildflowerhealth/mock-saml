@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { WfhEnv, WfhEnvs, getSamlConfig } from 'utils/settings';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -59,7 +60,6 @@ export default function Sydney() {
   }, [ssoFormState]);
 
   // Wait until after hydration to randomize initial state
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const timestamp = Math.floor(Date.now() / 100);
     const chance = new Chance();
@@ -215,7 +215,7 @@ export default function Sydney() {
       fundingType: ssoFormState.fundingType,
       targetEnvironment: ssoFormState.targetEnvironment,
       audience: ssoFormState.audience,
-      acsUrl: ssoFormState.acsUrl
+      acsUrl: ssoFormState.acsUrl,
     }),
     [ssoFormState]
   );
