@@ -5,9 +5,9 @@ import { useEffect, useRef, useState, ChangeEvent, useMemo, FormEvent } from 're
 import Chance from 'chance';
 import Link from 'next/link';
 import ToggleButton from 'components/ToggleButton';
-import MockEligibility from 'components/MockEligibility';
+import MockEligibility, { EligibilityFormData } from 'components/MockEligibility';
 
-type FormState = {
+export type SSOFormData = {
   firstName: string;
   lastName: string;
   dob: string;
@@ -34,7 +34,7 @@ export default function Sydney() {
   const authUrl = '/api/saml/auth-sydney';
   const initialTargetEnv = 'dev' as WfhEnv;
 
-  const [state, setState] = useState<FormState>({
+  const [ssoFormState, setSSOFormState] = useState<SSOFormData>({
     firstName: 'Marge',
     lastName: 'Simpson',
     dob: '01/01/1989',
@@ -50,13 +50,13 @@ export default function Sydney() {
     audience: getSamlConfig(initialTargetEnv).audience,
   });
 
-  const [jsonText, setJsonText] = useState<string>('');
-  const [jsonError, setJsonError] = useState<string | null>(null);
+  const [jsonTextState, setJsonTextState] = useState<string>('');
+  const [jsonErrorState, setJsonErrorState] = useState<string | null>(null);
 
-  // init jsonText state from initial form state
+  // init jsonText state from initial form states
   useEffect(() => {
-    setJsonText(JSON.stringify(state, null, 2));
-  }, [state]);
+    setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
+  }, [ssoFormState]);
 
   // Wait until after hydration to randomize initial state
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,7 +68,7 @@ export default function Sydney() {
     const email = removeSpacesAndApostrophes(
       `${randomFirstName}.${randomLastName}+test${timestamp}@wildflowerhealth.com`
     ).toLowerCase();
-    setState((prevState) => {
+    setSSOFormState((prevState) => {
       const newState = {
         ...prevState,
         email,
@@ -78,7 +78,7 @@ export default function Sydney() {
         lastName: randomLastName,
       };
       // also, update jsonText to match
-      setJsonText(JSON.stringify(newState, null, 2));
+      setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
       return newState;
     });
   }, []); // Empty array ensures this runs only once on mount
@@ -87,12 +87,12 @@ export default function Sydney() {
   const firstNameInp = useRef<HTMLInputElement>(null);
   const lastNameInp = useRef<HTMLInputElement>(null);
   const jsonTextAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [showMockForm, setShowMockForm] = useState(false);
+  const [showMockEligibilityForm, setShowMockEligibilityForm] = useState(false);
   const [useReactNative, setUseReactNative] = useState(false);
 
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.currentTarget;
-    let updatedState = { ...state };
+    let updatedState = { ...ssoFormState };
     if (name === 'targetEnvironment') {
       const targetEnv = value as unknown as WfhEnv;
       updatedState = {
@@ -107,14 +107,17 @@ export default function Sydney() {
         [name]: value,
       };
     }
-    setState(updatedState);
+    setSSOFormState(updatedState);
+    setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
+  };
 
-    setJsonText(JSON.stringify(updatedState, null, 2));
+  const handleEligibilityDataChange = (eligibilityFormData: EligibilityFormData) => {
+    setJsonTextState(JSON.stringify({ ...ssoFormState, eligibilityFormData }, null, 2));
   };
 
   const handleJsonChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     const newJsonText = e.target.value;
-    setJsonText(newJsonText);
+    setJsonTextState(newJsonText);
 
     try {
       const parsedJson = JSON.parse(newJsonText);
@@ -122,12 +125,12 @@ export default function Sydney() {
       // validate parsed json
       if (typeof parsedJson === 'object' && parsedJson !== null) {
         // use current state for any un-supplied properties in json
-        const newState = { ...state };
+        const newState = { ...ssoFormState };
 
         // update only props that exist in the json
-        Object.keys(state).forEach((key) => {
+        Object.keys(ssoFormState).forEach((key) => {
           if (key in parsedJson && typeof parsedJson[key] !== 'undefined') {
-            newState[key as keyof FormState] = parsedJson[key];
+            newState[key as keyof SSOFormData] = parsedJson[key];
           }
         });
 
@@ -149,13 +152,13 @@ export default function Sydney() {
           }
         }
 
-        setState(newState);
-        setJsonError(null);
+        setSSOFormState(newState);
+        setJsonErrorState(null);
       } else {
-        setJsonError('JSON must be an object');
+        setJsonErrorState('JSON must be an object');
       }
     } catch (e) {
-      setJsonError('Invalid JSON format');
+      setJsonErrorState('Invalid JSON format');
     }
   };
 
@@ -163,11 +166,11 @@ export default function Sydney() {
     e.preventDefault();
 
     // if useReactNative is set, and there is an acsReactNative URL for the target env, use that
-    let body: Record<string, any> = { ...state, relayState: relayState ?? '' };
+    let body: Record<string, any> = { ...ssoFormState, relayState: relayState ?? '' };
     if (!useReactNative) {
-      const acsCordovaWebAppDomain = getSamlConfig(state.targetEnvironment).acsCordovaWebAppDomain;
+      const acsCordovaWebAppDomain = getSamlConfig(ssoFormState.targetEnvironment).acsCordovaWebAppDomain;
       if (acsCordovaWebAppDomain) {
-        body = { ...state, acsUrl: acsCordovaWebAppDomain };
+        body = { ...ssoFormState, acsUrl: acsCordovaWebAppDomain };
       }
     }
 
@@ -200,29 +203,31 @@ export default function Sydney() {
 
   const mockEligibilityInitData = useMemo(
     () => ({
-      firstName: state.firstName,
-      lastName: state.lastName,
-      dob: state.dob,
-      hcid: state.hcid,
-      email: state.email,
-      proxyId: state.proxyId,
-      brandId: state.brandId,
-      employerId: state.employerId,
-      stateCode: state.stateCode,
-      fundingType: state.fundingType,
-      targetEnvironment: state.targetEnvironment,
+      firstName: ssoFormState.firstName,
+      lastName: ssoFormState.lastName,
+      dob: ssoFormState.dob,
+      hcid: ssoFormState.hcid,
+      email: ssoFormState.email,
+      proxyId: ssoFormState.proxyId,
+      brandId: ssoFormState.brandId,
+      employerId: ssoFormState.employerId,
+      stateCode: ssoFormState.stateCode,
+      fundingType: ssoFormState.fundingType,
+      targetEnvironment: ssoFormState.targetEnvironment,
+      audience: ssoFormState.audience,
+      acsUrl: ssoFormState.acsUrl
     }),
-    [state]
+    [ssoFormState]
   );
 
   const [session, setSession] = useState<any>(null);
 
-  const allowMockEligibilitySection = !['prod', 'uat'].includes(state.targetEnvironment);
+  const allowMockEligibilitySection = !['prod', 'uat'].includes(ssoFormState.targetEnvironment);
   useEffect(() => {
-    setShowMockForm(false);
+    setShowMockEligibilityForm(false);
   }, [allowMockEligibilitySection]);
 
-  const allowUseReactNativeToggle = !['prod', 'uat'].includes(state.targetEnvironment);
+  const allowUseReactNativeToggle = !['prod', 'uat'].includes(ssoFormState.targetEnvironment);
   useEffect(() => {
     setUseReactNative(false);
   }, [allowUseReactNativeToggle]);
@@ -257,8 +262,8 @@ export default function Sydney() {
               <div className='flex justify-center gap-4 mb-4'>
                 {allowMockEligibilitySection && (
                   <ToggleButton
-                    checked={showMockForm}
-                    onChange={setShowMockForm}
+                    checked={showMockEligibilityForm}
+                    onChange={setShowMockEligibilityForm}
                     label='Use Mock Eligibility'
                   />
                 )}
@@ -281,7 +286,7 @@ export default function Sydney() {
                       id='targetEnvironment'
                       className='select select-bordered w-full'
                       onChange={handleChange}
-                      value={state.targetEnvironment}>
+                      value={ssoFormState.targetEnvironment}>
                       {WfhEnvs.map((env, index) => (
                         <option key={index} value={env}>
                           {env}
@@ -302,7 +307,7 @@ export default function Sydney() {
                         autoComplete='off'
                         type='text'
                         placeholder='Marge'
-                        value={state.firstName}
+                        value={ssoFormState.firstName}
                         onChange={handleChange}
                         className='input input-bordered w-full'
                         title='Please provide a mock first name'
@@ -320,7 +325,7 @@ export default function Sydney() {
                         autoComplete='off'
                         type='text'
                         placeholder='Simpson'
-                        value={state.lastName}
+                        value={ssoFormState.lastName}
                         onChange={handleChange}
                         className='input input-bordered w-full'
                         title='Please provide a mock last name'
@@ -339,7 +344,7 @@ export default function Sydney() {
                         autoComplete='off'
                         type='text'
                         placeholder='01/01/1989'
-                        value={state.dob}
+                        value={ssoFormState.dob}
                         onChange={handleChange}
                         className='input input-bordered w-full'
                         title='Please provide a mock dob'
@@ -356,7 +361,7 @@ export default function Sydney() {
                         autoComplete='off'
                         type='text'
                         placeholder='SIM333M12345'
-                        value={state.hcid}
+                        value={ssoFormState.hcid}
                         onChange={handleChange}
                         className='input input-bordered w-full'
                         title='Please provide a mock hcid'
@@ -375,7 +380,7 @@ export default function Sydney() {
                       autoComplete='off'
                       type='text'
                       placeholder='noah@wildflowerhealth.com'
-                      value={state.email}
+                      value={ssoFormState.email}
                       onChange={handleChange}
                       className='input input-bordered w-full'
                       title='Please provide a mock email address'
@@ -392,7 +397,7 @@ export default function Sydney() {
                       autoComplete='off'
                       type='text'
                       placeholder='prox1740635124'
-                      value={state.proxyId}
+                      value={ssoFormState.proxyId}
                       onChange={handleChange}
                       className='input input-bordered w-full'
                       title='Please provide a mock proxy Id'
@@ -410,7 +415,7 @@ export default function Sydney() {
                         autoComplete='off'
                         type='text'
                         placeholder='ABC'
-                        value={state.brandId}
+                        value={ssoFormState.brandId}
                         onChange={handleChange}
                         className='input input-bordered w-full'
                         title='Please provide a mock brand Id'
@@ -427,7 +432,7 @@ export default function Sydney() {
                         autoComplete='off'
                         type='text'
                         placeholder='993908'
-                        value={state.employerId}
+                        value={ssoFormState.employerId}
                         onChange={handleChange}
                         className='input input-bordered w-full'
                         title='Please provide a mock employer Id'
@@ -446,7 +451,7 @@ export default function Sydney() {
                         autoComplete='off'
                         type='text'
                         placeholder='CA'
-                        value={state.stateCode}
+                        value={ssoFormState.stateCode}
                         onChange={handleChange}
                         className='input input-bordered w-full'
                         title='Please provide a mock state code'
@@ -463,7 +468,7 @@ export default function Sydney() {
                         autoComplete='off'
                         type='text'
                         placeholder=''
-                        value={state.fundingType}
+                        value={ssoFormState.fundingType}
                         onChange={handleChange}
                         className='input input-bordered w-full'
                         title='Please provide a mock funding type'
@@ -471,14 +476,18 @@ export default function Sydney() {
                     </div>
                   </div>
 
-                  <button className='btn btn-primary block mt-4' disabled={Boolean(jsonError)}>
+                  <button className='btn btn-primary block mt-4' disabled={Boolean(jsonErrorState)}>
                     Launch Wildflower
                   </button>
                 </div>
               </form>
             </div>
-            {allowMockEligibilitySection && showMockForm && (
-              <MockEligibility SSOFromData={mockEligibilityInitData} />
+            {allowMockEligibilitySection && showMockEligibilityForm && (
+              <MockEligibility
+                SSOFormData={mockEligibilityInitData}
+                onDataChange={handleEligibilityDataChange}
+                onMount={handleEligibilityDataChange}
+              />
             )}
           </div>
 
@@ -490,19 +499,19 @@ export default function Sydney() {
                 <button
                   type='button'
                   className='btn btn-xs'
-                  onClick={() => navigator.clipboard.writeText(JSON.stringify(state, null, 2))}>
+                  onClick={() => navigator.clipboard.writeText(jsonTextState)}>
                   Copy
                 </button>
               </div>
-              {jsonError && (
+              {jsonErrorState && (
                 <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-2'>
-                  {jsonError}
+                  {jsonErrorState}
                 </div>
               )}
               <textarea
                 ref={jsonTextAreaRef}
                 className='w-full bg-gray-100 p-3 rounded text-sm font-mono h-[calc(100%-3rem)] mt-2'
-                value={jsonText}
+                value={jsonTextState}
                 onChange={handleJsonChange}
                 style={{ resize: 'none' }}
               />

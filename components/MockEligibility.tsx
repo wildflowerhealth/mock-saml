@@ -1,4 +1,6 @@
-import { type FormEvent, useState, useEffect } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { SSOFormData } from 'pages/saml/sydney';
+import { type FormEvent, useState, useEffect, useRef } from 'react';
 
 const programOptions = [
   {
@@ -27,39 +29,43 @@ const lastDay = new Date(year, 11, 31).toLocaleDateString('en-US', {
   year: 'numeric',
 });
 
-type InitFormData = {
-  firstName: string;
-  lastName: string;
-  dob: string;
-  hcid: string;
-  email: string;
-  proxyId: string;
-  brandId: string;
-  employerId: string;
-  stateCode: string;
-  fundingType: string;
-  targetEnvironment: string;
+export type EligibilitySpecificData = {
+  zipCode: string;
+  gender: string;
+  subRelation: string;
+  groupId: string;
+  programId: string;
+  brandCd: string;
+  fundingTypeCd: string;
+  underwritingStateCd: string;
+  programNm: string;
+  cvrgStartDt: string;
+  cvrgEndDt: string;
 };
 
+export type EligibilityFormData = SSOFormData & EligibilitySpecificData;
+
 interface MockEligibilityProps {
-  SSOFromData: InitFormData;
+  SSOFormData: SSOFormData;
   onSuccess?: () => void;
+  onDataChange?: (eligibilityData: EligibilityFormData) => void;
+  onMount?: (formData: EligibilityFormData) => void;
 }
 
 export default function MockEligibility(props: MockEligibilityProps) {
-  const { SSOFromData, onSuccess } = props;
+  const { SSOFormData, onSuccess, onDataChange, onMount } = props;
   const [hasError, setHasError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    ...SSOFromData,
+  const [formData, setFormData] = useState<EligibilityFormData>({
+    ...SSOFormData,
     zipCode: '98101',
     gender: 'F',
     subRelation: 'SCRBR',
     groupId: '98101',
     programId: programOptions[0].id,
     brandCd: 'ABCBS',
-    fundingTypeCd: SSOFromData.fundingType,
-    underwritingStateCd: SSOFromData.stateCode,
+    fundingTypeCd: SSOFormData.fundingType,
+    underwritingStateCd: SSOFormData.stateCode,
     programNm: programOptions[0].nm,
     cvrgStartDt: firstDay,
     cvrgEndDt: lastDay,
@@ -68,18 +74,17 @@ export default function MockEligibility(props: MockEligibilityProps) {
   useEffect(() => {
     setFormData({
       ...formData,
-      ...SSOFromData,
-      fundingTypeCd: SSOFromData.fundingType,
-      underwritingStateCd: SSOFromData.stateCode,
+      ...SSOFormData,
+      fundingTypeCd: SSOFormData.fundingType,
+      underwritingStateCd: SSOFormData.stateCode,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [SSOFromData]);
+  }, [SSOFormData]);
+
   useEffect(() => {
     setFormData({
       ...formData,
       programId: programOptions.find((opt) => formData.programNm === opt.nm)?.id || '',
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.programNm]);
 
   useEffect(() => {
@@ -90,9 +95,17 @@ export default function MockEligibility(props: MockEligibilityProps) {
     }
   }, [formData]);
 
+  useEffect(() => {
+    if (onMount) {
+      onMount(formData);
+    }
+  }, []); // Empty dependency array = run once on mount
+
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.currentTarget;
-    setFormData({ ...formData, [name]: value });
+    const updatedFormData = { ...formData, [name]: value };
+    setFormData(updatedFormData);
+    onDataChange?.(updatedFormData);
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -373,8 +386,8 @@ export default function MockEligibility(props: MockEligibilityProps) {
                 <span className='label-text font-bold'>GroupId</span>
               </label>
               <input
-                name='GroupId'
-                id='GroupId'
+                name='groupId'
+                id='groupId'
                 autoComplete='off'
                 type='text'
                 placeholder='98101'
