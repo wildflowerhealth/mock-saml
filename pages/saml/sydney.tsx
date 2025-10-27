@@ -59,9 +59,13 @@ export default function Sydney() {
   // init jsonText state from initial form states
   useEffect(() => {
     if (showMockEligibilityForm) {
-      setJsonTextState(JSON.stringify({ ...ssoFormState, eligibilityData: eligibilityDataFromForm }, null, 2));
+      setJsonTextState(
+        JSON.stringify({ ...ssoFormState, eligibilityData: eligibilityDataFromForm }, null, 2)
+      );
     } else if (eligibilityDataFromJson) {
-      setJsonTextState(JSON.stringify({ ...ssoFormState, eligibilityData: eligibilityDataFromJson }, null, 2));
+      setJsonTextState(
+        JSON.stringify({ ...ssoFormState, eligibilityData: eligibilityDataFromJson }, null, 2)
+      );
     } else {
       setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
     }
@@ -125,13 +129,13 @@ export default function Sydney() {
     setJsonTextState(JSON.stringify({ ...ssoFormState, eligibilityFormData }, null, 2));
   };
 
-  const handleEligibilityFormToggle = (e: boolean ) => {
+  const handleEligibilityFormToggle = (e: boolean) => {
     setShowMockEligibilityForm(e);
     // if the toggle is off, remove eligibility data from the json text
     if (!e) {
       setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
     }
-  }
+  };
 
   const handleJsonChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     const newJsonText = e.target.value;
