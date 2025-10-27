@@ -54,7 +54,6 @@ export default function Sydney() {
   const [jsonTextState, setJsonTextState] = useState<string>('');
   const [jsonErrorState, setJsonErrorState] = useState<string | null>(null);
   const [eligibilityDataFromJson, setEligibilityDataFromJson] = useState<EligibilityFormData | null>(null);
-  // the eligibilityDataFromForm state is not submitted, it's just used to keep a fresh version of the data for the JSON text area
   const [eligibilityDataFromForm, setEligibilityDataFromForm] = useState<EligibilityFormData | null>(null);
 
   // init jsonText state from initial form states
@@ -98,6 +97,7 @@ export default function Sydney() {
   const jsonTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const [showMockEligibilityForm, setShowMockEligibilityForm] = useState(false);
   const [useReactNative, setUseReactNative] = useState(false);
+  const [isSubmittingWithMockEligibility, setIsSubmittingWithMockEligibility] = useState(false);
 
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.currentTarget;
@@ -191,6 +191,31 @@ export default function Sydney() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // If Mock Eligibility is enabled, save that data first
+    if (showMockEligibilityForm && eligibilityDataFromForm) {
+      setIsSubmittingWithMockEligibility(true);
+      try {
+        const mockEligibilityUrl = '/api/saml/mock-eligibility';
+        const mockEligibilityResponse = await fetch(mockEligibilityUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(eligibilityDataFromForm),
+        });
+
+        if (!mockEligibilityResponse.ok) {
+          setIsSubmittingWithMockEligibility(false);
+          alert('Error saving Mock Eligibility data. SSO submission cancelled.');
+          return;
+        }
+      } catch (error) {
+        setIsSubmittingWithMockEligibility(false);
+        alert('Error saving Mock Eligibility data. SSO submission cancelled.');
+        return;
+      }
+    }
+
     // if useReactNative is set, and there is an acsReactNative URL for the target env, use that
     let body: Record<string, any> = { ...ssoFormState, relayState: relayState ?? '' };
     if (!useReactNative) {
@@ -223,6 +248,7 @@ export default function Sydney() {
       newDoc.write(await response.text());
       newDoc.close();
     } else {
+      setIsSubmittingWithMockEligibility(false);
       document.write('Error in getting SAML response');
     }
   };
@@ -502,8 +528,10 @@ export default function Sydney() {
                     </div>
                   </div>
 
-                  <button className='btn btn-primary block mt-4' disabled={Boolean(jsonErrorState)}>
-                    Launch Wildflower
+                  <button
+                    className='btn btn-primary block mt-4'
+                    disabled={Boolean(jsonErrorState) || isSubmittingWithMockEligibility}>
+                    {isSubmittingWithMockEligibility ? 'Saving Mock Eligibility...' : 'Launch Wildflower'}
                   </button>
                 </div>
               </form>
@@ -514,6 +542,7 @@ export default function Sydney() {
                 onDataChange={handleEligibilityDataChange}
                 onMount={handleEligibilityDataChange}
                 eligibilityDataFromJson={eligibilityDataFromJson}
+                hideSaveButton={true}
               />
             )}
           </div>

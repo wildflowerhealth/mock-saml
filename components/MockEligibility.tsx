@@ -51,10 +51,11 @@ interface MockEligibilityProps {
   onDataChange?: (eligibilityData: EligibilityFormData) => void;
   onMount?: (formData: EligibilityFormData) => void;
   eligibilityDataFromJson?: EligibilityFormData | null;
+  hideSaveButton?: boolean;
 }
 
 export default function MockEligibility(props: MockEligibilityProps) {
-  const { SSOFormData, onSuccess, onDataChange, onMount, eligibilityDataFromJson } = props;
+  const { SSOFormData, onSuccess, onDataChange, onMount, eligibilityDataFromJson, hideSaveButton } = props;
   const [hasError, setHasError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<EligibilityFormData>({
@@ -116,6 +117,8 @@ export default function MockEligibility(props: MockEligibilityProps) {
     onDataChange?.(updatedFormData);
   };
 
+  // Deprecated, leaving in place in case prior functionality is requested
+  // the parent form "SSO Form" now calls this endpoint and waits before submitting the SSO request
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -513,31 +516,33 @@ export default function MockEligibility(props: MockEligibilityProps) {
           </div>
         </section>
 
-        <button
-          type='submit'
-          className='btn btn-primary mt-4 w-full flex items-center justify-center'
-          disabled={hasError || loading}>
-          {loading && (
-            <svg
-              className='animate-spin h-5 w-5 mr-2 text-white'
-              xmlns='http://www.w3.org/2000/svg'
-              fill='none'
-              viewBox='0 0 24 24'>
-              <circle
-                className='opacity-25'
-                cx='12'
-                cy='12'
-                r='10'
-                stroke='currentColor'
-                strokeWidth='4'></circle>
-              <path
-                className='opacity-75'
-                fill='currentColor'
-                d='M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z'></path>
-            </svg>
-          )}
-          {loading ? 'Loading...' : 'Save'}
-        </button>
+        {!hideSaveButton && (
+          <button
+            type='submit'
+            className='btn btn-primary mt-4 w-full flex items-center justify-center'
+            disabled={hasError || loading}>
+            {loading && (
+              <svg
+                className='animate-spin h-5 w-5 mr-2 text-white'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'>
+                <circle
+                  className='opacity-25'
+                  cx='12'
+                  cy='12'
+                  r='10'
+                  stroke='currentColor'
+                  strokeWidth='4'></circle>
+                <path
+                  className='opacity-75'
+                  fill='currentColor'
+                  d='M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z'></path>
+              </svg>
+            )}
+            {loading ? 'Loading...' : 'Save'}
+          </button>
+        )}
       </form>
     </div>
   );
