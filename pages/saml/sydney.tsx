@@ -90,7 +90,7 @@ export default function Sydney() {
         lastName: randomLastName,
       };
       // also, update jsonText to match
-      setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
+      setJsonTextState(JSON.stringify(newState, null, 2));
       return newState;
     });
   }, []); // Empty array ensures this runs only once on mount
