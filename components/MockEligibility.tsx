@@ -50,10 +50,11 @@ interface MockEligibilityProps {
   onSuccess?: () => void;
   onDataChange?: (eligibilityData: EligibilityFormData) => void;
   onMount?: (formData: EligibilityFormData) => void;
+  eligibilityDataFromJson?: EligibilityFormData | null;
 }
 
 export default function MockEligibility(props: MockEligibilityProps) {
-  const { SSOFormData, onSuccess, onDataChange, onMount } = props;
+  const { SSOFormData, onSuccess, onDataChange, onMount, eligibilityDataFromJson } = props;
   const [hasError, setHasError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<EligibilityFormData>({
@@ -100,6 +101,13 @@ export default function MockEligibility(props: MockEligibilityProps) {
       onMount(formData);
     }
   }, []); // Empty dependency array = run once on mount
+
+  // Update form data when eligibility data is pasted from JSON
+  useEffect(() => {
+    if (eligibilityDataFromJson) {
+      setFormData(eligibilityDataFromJson);
+    }
+  }, [eligibilityDataFromJson]);
 
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.currentTarget;

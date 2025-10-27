@@ -53,10 +53,19 @@ export default function Sydney() {
 
   const [jsonTextState, setJsonTextState] = useState<string>('');
   const [jsonErrorState, setJsonErrorState] = useState<string | null>(null);
+  const [eligibilityDataFromJson, setEligibilityDataFromJson] = useState<EligibilityFormData | null>(null);
+  // the eligibilityDataFromForm state is not submitted, it's just used to keep a fresh version of the data for the JSON text area
+  const [eligibilityDataFromForm, setEligibilityDataFromForm] = useState<EligibilityFormData | null>(null);
 
   // init jsonText state from initial form states
   useEffect(() => {
-    setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
+    if (showMockEligibilityForm) {
+      setJsonTextState(JSON.stringify({ ...ssoFormState, eligibilityData: eligibilityDataFromForm }, null, 2));
+    } else if (eligibilityDataFromJson) {
+      setJsonTextState(JSON.stringify({ ...ssoFormState, eligibilityData: eligibilityDataFromJson }, null, 2));
+    } else {
+      setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
+    }
   }, [ssoFormState]);
 
   // Wait until after hydration to randomize initial state
@@ -112,8 +121,17 @@ export default function Sydney() {
   };
 
   const handleEligibilityDataChange = (eligibilityFormData: EligibilityFormData) => {
+    setEligibilityDataFromForm(eligibilityFormData);
     setJsonTextState(JSON.stringify({ ...ssoFormState, eligibilityFormData }, null, 2));
   };
+
+  const handleEligibilityFormToggle = (e: boolean ) => {
+    setShowMockEligibilityForm(e);
+    // if the toggle is off, remove eligibility data from the json text
+    if (!e) {
+      setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
+    }
+  }
 
   const handleJsonChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     const newJsonText = e.target.value;
@@ -150,6 +168,14 @@ export default function Sydney() {
           if (!('audience' in parsedJson)) {
             newState.audience = getSamlConfig(targetEnv).audience;
           }
+        }
+
+        // handle eligibilityFormData if it exists in the pasted JSON
+        if ('eligibilityFormData' in parsedJson && typeof parsedJson.eligibilityFormData === 'object') {
+          setEligibilityDataFromJson(parsedJson.eligibilityFormData as EligibilityFormData);
+          setShowMockEligibilityForm(true);
+        } else {
+          setEligibilityDataFromJson(null);
         }
 
         setSSOFormState(newState);
@@ -263,7 +289,7 @@ export default function Sydney() {
                 {allowMockEligibilitySection && (
                   <ToggleButton
                     checked={showMockEligibilityForm}
-                    onChange={setShowMockEligibilityForm}
+                    onChange={handleEligibilityFormToggle}
                     label='Use Mock Eligibility'
                   />
                 )}
@@ -487,6 +513,7 @@ export default function Sydney() {
                 SSOFormData={mockEligibilityInitData}
                 onDataChange={handleEligibilityDataChange}
                 onMount={handleEligibilityDataChange}
+                eligibilityDataFromJson={eligibilityDataFromJson}
               />
             )}
           </div>
