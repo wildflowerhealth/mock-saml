@@ -412,7 +412,6 @@ export default function MockEligibility(props: MockEligibilityProps) {
                 onChange={handleChange}
                 className='input input-bordered w-full'
                 title='Please provide a mock underwritingStateCd'
-                disabled
               />
             </div>
 
@@ -429,7 +428,6 @@ export default function MockEligibility(props: MockEligibilityProps) {
                 onChange={handleChange}
                 className='input input-bordered w-full'
                 title='Please provide a mock fundingTypeCd'
-                disabled
               />
             </div>
           </div>
