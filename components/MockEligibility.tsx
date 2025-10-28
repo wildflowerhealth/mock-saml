@@ -83,10 +83,12 @@ export default function MockEligibility(props: MockEligibilityProps) {
   }, [SSOFormData]);
 
   useEffect(() => {
-    setFormData({
+    const updatedFormData = {
       ...formData,
       programId: programOptions.find((opt) => formData.programNm === opt.nm)?.id || '',
-    });
+    };
+    setFormData(updatedFormData);
+    onDataChange?.(updatedFormData);
   }, [formData.programNm]);
 
   useEffect(() => {
