@@ -55,21 +55,24 @@ export default function Sydney() {
   const [jsonErrorState, setJsonErrorState] = useState<string | null>(null);
   const [eligibilityDataFromJson, setEligibilityDataFromJson] = useState<EligibilityFormData | null>(null);
   const [eligibilityDataFromForm, setEligibilityDataFromForm] = useState<EligibilityFormData | null>(null);
+  const [showMockEligibilityForm, setShowMockEligibilityForm] = useState(false);
+  const [useReactNative, setUseReactNative] = useState(false);
+  const [isSubmittingWithMockEligibility, setIsSubmittingWithMockEligibility] = useState(false);
 
   // init jsonText state from initial form states
   useEffect(() => {
-    if (showMockEligibilityForm) {
+    if (showMockEligibilityForm && eligibilityDataFromForm) {
       setJsonTextState(
-        JSON.stringify({ ...ssoFormState, eligibilityData: eligibilityDataFromForm }, null, 2)
+        JSON.stringify({ ...ssoFormState, eligibilityFormData: eligibilityDataFromForm }, null, 2)
       );
     } else if (eligibilityDataFromJson) {
       setJsonTextState(
-        JSON.stringify({ ...ssoFormState, eligibilityData: eligibilityDataFromJson }, null, 2)
+        JSON.stringify({ ...ssoFormState, eligibilityFormData: eligibilityDataFromJson }, null, 2)
       );
     } else {
       setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
     }
-  }, [ssoFormState]);
+  }, [ssoFormState, showMockEligibilityForm, eligibilityDataFromForm, eligibilityDataFromJson]);
 
   // Wait until after hydration to randomize initial state
   useEffect(() => {
@@ -99,9 +102,6 @@ export default function Sydney() {
   const firstNameInp = useRef<HTMLInputElement>(null);
   const lastNameInp = useRef<HTMLInputElement>(null);
   const jsonTextAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [showMockEligibilityForm, setShowMockEligibilityForm] = useState(false);
-  const [useReactNative, setUseReactNative] = useState(false);
-  const [isSubmittingWithMockEligibility, setIsSubmittingWithMockEligibility] = useState(false);
 
   const handleChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.currentTarget;
@@ -136,8 +136,10 @@ export default function Sydney() {
 
   const handleEligibilityFormToggle = (e: boolean) => {
     setShowMockEligibilityForm(e);
-    // if the toggle is off, remove eligibility data from the json text
+    // if the toggle is off, clear eligibility data from state and json text
     if (!e) {
+      setEligibilityDataFromForm(null);
+      setEligibilityDataFromJson(null);
       setJsonTextState(JSON.stringify({ ...ssoFormState }, null, 2));
     }
   };
@@ -302,7 +304,7 @@ export default function Sydney() {
   return (
     <>
       <Head>
-        <title>Mock Syndey Identity Provider </title>
+        <title>Mock Sydney Identity Provider </title>
       </Head>
       <div className='flex items-start justify-center p-4'>
         {session ? (
