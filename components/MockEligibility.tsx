@@ -146,8 +146,8 @@ export default function MockEligibility(props: MockEligibilityProps) {
   };
 
   return (
-    <div className='min-h-screen flex items-center justify-center py-4'>
-      <form onSubmit={handleSubmit} className='bg-white p-6 rounded-xl shadow-lg w-full max-w-3xl space-y-6'>
+    <div className='mt-6'>
+      <form onSubmit={handleSubmit} className='border-2 bg-white p-6 rounded-lg w-full space-y-6'>
         <h1 className='text-2xl font-bold text-gray-800'>Mock Eligibility</h1>
 
         <div className='flex flex-col sm:flex-row gap-3'>
