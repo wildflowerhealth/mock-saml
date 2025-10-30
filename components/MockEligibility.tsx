@@ -43,7 +43,7 @@ export type EligibilitySpecificData = {
   cvrgEndDt: string;
 };
 
-export type EligibilityFormData = SSOFormData & EligibilitySpecificData;
+export type EligibilityFormData = Omit<SSOFormData, 'fundingType'> & EligibilitySpecificData;
 
 interface MockEligibilityProps {
   SSOFormData: SSOFormData;
@@ -58,8 +58,10 @@ export default function MockEligibility(props: MockEligibilityProps) {
   const { SSOFormData, onSuccess, onDataChange, onMount, eligibilityDataFromJson, hideSaveButton } = props;
   const [hasError, setHasError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const { fundingType, ...SSOFormDataWithoutFundingType } = SSOFormData; // remove funding type
   const [formData, setFormData] = useState<EligibilityFormData>({
-    ...SSOFormData,
+    ...SSOFormDataWithoutFundingType,
     zipCode: '98101',
     gender: 'F',
     subRelation: 'SCRBR',
@@ -144,8 +146,8 @@ export default function MockEligibility(props: MockEligibilityProps) {
   };
 
   return (
-    <div className='min-h-screen flex items-center justify-center py-4'>
-      <form onSubmit={handleSubmit} className='bg-white p-6 rounded-xl shadow-lg w-full max-w-3xl space-y-6'>
+    <div className='mt-6'>
+      <form onSubmit={handleSubmit} className='border-2 bg-white p-6 rounded-lg w-full space-y-6'>
         <h1 className='text-2xl font-bold text-gray-800'>Mock Eligibility</h1>
 
         <div className='flex flex-col sm:flex-row gap-3'>
@@ -253,78 +255,6 @@ export default function MockEligibility(props: MockEligibilityProps) {
             disabled
           />
         </div>
-
-        <div className='flex flex-col sm:flex-row gap-3'>
-          <div className='form-control flex-1'>
-            <label className='label'>
-              <span className='label-text font-bold'>Brand Id</span>
-            </label>
-            <input
-              name='brandId'
-              id='brandId'
-              autoComplete='off'
-              type='text'
-              value={formData.brandId}
-              onChange={handleChange}
-              className='input input-bordered w-full'
-              title='Please provide a mock brand Id'
-              disabled
-            />
-          </div>
-
-          <div className='form-control flex-1'>
-            <label className='label'>
-              <span className='label-text font-bold'>Employer Id</span>
-            </label>
-            <input
-              name='employerId'
-              id='employerId'
-              autoComplete='off'
-              type='text'
-              value={formData.employerId}
-              onChange={handleChange}
-              className='input input-bordered w-full'
-              title='Please provide a mock employer Id'
-              disabled
-            />
-          </div>
-        </div>
-
-        <div className='flex flex-col sm:flex-row gap-3'>
-          <div className='form-control flex-1'>
-            <label className='label'>
-              <span className='label-text font-bold'>State Code</span>
-            </label>
-            <input
-              name='stateCode'
-              id='stateCode'
-              autoComplete='off'
-              type='text'
-              value={formData.stateCode}
-              onChange={handleChange}
-              className='input input-bordered w-full'
-              title='Please provide a mock state code'
-              disabled
-            />
-          </div>
-
-          <div className='form-control flex-1'>
-            <label className='label'>
-              <span className='label-text font-bold'>Funding Type</span>
-            </label>
-            <input
-              name='fundingType'
-              id='fundingType'
-              autoComplete='off'
-              type='text'
-              value={formData.fundingType}
-              onChange={handleChange}
-              className='input input-bordered w-full'
-              title='Please provide a mock funding type'
-              disabled
-            />
-          </div>
-        </div>
         <div className='flex flex-col sm:flex-row gap-3'>
           <div className='form-control flex-1'>
             <label className='label'>
@@ -376,6 +306,23 @@ export default function MockEligibility(props: MockEligibilityProps) {
         </div>
         <section className='border border-gray-300 p-6 rounded-lg'>
           <h2 className='text-sm font-bold mb-4'>Contract</h2>
+          <div className='flex flex-col sm:flex-row gap-3'>
+            <div className='form-control flex-1'>
+              <label className='label'>
+                <span className='label-text font-bold'>State Code</span>
+              </label>
+              <input
+                name='stateCode'
+                id='stateCode'
+                autoComplete='off'
+                type='text'
+                value={formData.stateCode}
+                onChange={handleChange}
+                className='input input-bordered w-full'
+                title='Please provide a mock state code'
+              />
+            </div>
+          </div>
           <div className='flex flex-col sm:flex-row gap-3'>
             <div className='form-control flex-1'>
               <label className='label'>

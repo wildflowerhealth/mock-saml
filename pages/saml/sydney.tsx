@@ -123,7 +123,9 @@ export default function Sydney() {
     setSSOFormState(updatedState);
     // Update JSON with the new state, including eligibility data if present
     if (showMockEligibilityForm && eligibilityDataFromForm) {
-      setJsonTextState(JSON.stringify({ ...updatedState, eligibilityFormData: eligibilityDataFromForm }, null, 2));
+      setJsonTextState(
+        JSON.stringify({ ...updatedState, eligibilityFormData: eligibilityDataFromForm }, null, 2)
+      );
     } else {
       setJsonTextState(JSON.stringify(updatedState, null, 2));
     }
