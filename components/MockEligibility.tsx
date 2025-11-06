@@ -8,11 +8,11 @@ const programOptions = [
     id: '1070431',
   },
   {
-    nm: 'Building Healthy Families Complete Doula Benefit',
+    nm: 'BUILDING HEALTHY FAMILIES COMPLETE DOULA BENEFIT',
     id: '1359586',
   },
   {
-    nm: 'Building Healthy Families Complete With Doula Care',
+    nm: 'BUILDING HEALTHY FAMILIES COMPLETE WITH DOULA CARE',
     id: '1359585',
   },
 ];
