@@ -292,7 +292,7 @@ export default function Sydney() {
     setShowMockEligibilityForm(false);
   }, [allowMockEligibilitySection]);
 
-  const allowUseReactNativeToggle = !['prod', 'uat'].includes(ssoFormState.targetEnvironment);
+  const allowUseReactNativeToggle = !['prod'].includes(ssoFormState.targetEnvironment);
   useEffect(() => {
     setUseReactNative(false);
   }, [allowUseReactNativeToggle]);
