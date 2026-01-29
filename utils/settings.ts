@@ -41,7 +41,7 @@ const samlConfigMap: Record<WfhEnv, SamlConfig> = {
     agApiKey: process.env.AG_API_KEY ?? 'e020b2a6-30af-46f6-9524-c33dc0598461',
   },
   uat: {
-    acs: 'https://anthem-staging.buildinghealthyfamilies.ai,' + acsPath,
+    acs: 'https://anthem-staging.buildinghealthyfamilies.ai' + acsPath,
     acsCordovaWebAppDomain: 'https://anthem-cordova.uat.wildflowerhealth.digital' + acsPath,
     audience: 'com.wildflowerhealth.saml.uat',
   },
