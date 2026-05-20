@@ -6,10 +6,11 @@ Forked from [BoxyHQ/mock-saml](https://github.com/boxyhq/mock-saml).
 
 ## Mock Providers
 
-| Provider    | Type        | Page                     | Description                                                                   |
-| ----------- | ----------- | ------------------------ | ----------------------------------------------------------------------------- |
-| Sydney SSO  | SAML 2.0    | `/saml/sydney`           | Anthem/Sydney SAML IdP with configurable user attributes and mock eligibility |
-| Cigna Auth0 | OAuth2/OIDC | `/cigna-auth0/authorize` | Mock Cigna Auth0 with test users, token exchange, and mock API endpoints      |
+| Provider     | Type        | Page                     | Description                                                                              |
+| ------------ | ----------- | ------------------------ | ---------------------------------------------------------------------------------------- |
+| Sydney SSO   | SAML 2.0    | `/saml/sydney`           | Anthem/Sydney SAML IdP with configurable user attributes and mock eligibility            |
+| Elevance SSO | SAML 2.0    | `/saml/elevance`         | Anthem/Elevance Okta SAML IdP (parallel to Sydney; targets `/api/sso/saml/elevance` ACS) |
+| Cigna Auth0  | OAuth2/OIDC | `/cigna-auth0/authorize` | Mock Cigna Auth0 with test users, token exchange, and mock API endpoints                 |
 
 ## Quick Start
 
