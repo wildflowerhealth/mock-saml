@@ -50,3 +50,8 @@ export type SydneyUserAttributes = {
   UnderWritingStateCd?: string;
   FundgTypeCd?: string;
 };
+
+// Mirrors SydneyUserAttributes until Elevance's Okta IdP confirms its
+// outbound attribute names. Kept as a distinct type so the eventual
+// divergence is a one-file change rather than a search-and-replace.
+export type ElevanceUserAttributes = SydneyUserAttributes;
