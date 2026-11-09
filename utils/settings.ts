@@ -102,3 +102,23 @@ const elevanceSamlConfigMap: Record<WfhEnv, SamlConfig> = {
 export const getElevanceSamlConfig = (env: WfhEnv): SamlConfig => {
   return elevanceSamlConfigMap[env];
 };
+
+// Every Mother's UHC sign-in (SYS-21234). Only the environments that trust the mock UHC
+// IdP are offered: local, dev and stage. iat trusts Optum's real staging IdP, and uat and
+// prod never trust the mock. The route is app-gateway's `/api/sso/saml/:idp` with the
+// `uhc` provider that I4 (SYS-20903) adds; until that lands app-gateway refuses the post
+// as an unknown provider.
+export type UhcWfhEnv = Extract<WfhEnv, 'local' | 'dev' | 'stage'>;
+export const UhcWfhEnvs: UhcWfhEnv[] = ['local', 'dev', 'stage'];
+
+const uhcAcsPath = '/api/sso/saml/uhc';
+
+const uhcAcsMap: Record<UhcWfhEnv, string> = {
+  local: 'http://127.0.0.1:3005' + uhcAcsPath,
+  dev: 'https://app-gateway.dev.wildflowerhealth.net' + uhcAcsPath,
+  stage: 'https://app-gateway.stage.wildflowerhealth.net' + uhcAcsPath,
+};
+
+export const getUhcAcsUrl = (env: UhcWfhEnv): string => {
+  return uhcAcsMap[env];
+};

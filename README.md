@@ -1,16 +1,17 @@
 # Mock SSO
 
-Mock identity provider service for testing SSO integrations. Supports SAML 2.0 (Sydney/Anthem) and OAuth2/OIDC (Cigna Auth0).
+Mock identity provider service for testing SSO integrations. Supports SAML 2.0 (Sydney/Anthem, Elevance, and UHC for Every Mother) and OAuth2/OIDC (Cigna Auth0).
 
 Forked from [BoxyHQ/mock-saml](https://github.com/boxyhq/mock-saml).
 
 ## Mock Providers
 
-| Provider     | Type        | Page                     | Description                                                                              |
-| ------------ | ----------- | ------------------------ | ---------------------------------------------------------------------------------------- |
-| Sydney SSO   | SAML 2.0    | `/saml/sydney`           | Anthem/Sydney SAML IdP with configurable user attributes and mock eligibility            |
-| Elevance SSO | SAML 2.0    | `/saml/elevance`         | Anthem/Elevance Okta SAML IdP (parallel to Sydney; targets `/api/sso/saml/elevance` ACS) |
-| Cigna Auth0  | OAuth2/OIDC | `/cigna-auth0/authorize` | Mock Cigna Auth0 with test users, token exchange, and mock API endpoints                 |
+| Provider     | Type        | Page                     | Description                                                                                                                    |
+| ------------ | ----------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Sydney SSO   | SAML 2.0    | `/saml/sydney`           | Anthem/Sydney SAML IdP with configurable user attributes and mock eligibility                                                  |
+| Elevance SSO | SAML 2.0    | `/saml/elevance`         | Anthem/Elevance Okta SAML IdP (parallel to Sydney; targets `/api/sso/saml/elevance` ACS)                                       |
+| UHC SSO      | SAML 2.0    | `/saml/uhc`              | Optum's IdP for Every Mother's UHC sign-in. Local, dev and stage only; iat uses Optum's staging IdP (see [UHC](#uhc-sso-mock)) |
+| Cigna Auth0  | OAuth2/OIDC | `/cigna-auth0/authorize` | Mock Cigna Auth0 with test users, token exchange, and mock API endpoints                                                       |
 
 ## Quick Start
 
@@ -19,7 +20,46 @@ npm install
 npm run serve    # Build and start on port 4123
 ```
 
-Open http://localhost:4123 to see both providers.
+Open http://localhost:4123 to see all providers.
+
+## UHC SSO Mock
+
+UHC members reach Every Mother only by clicking through from the UHC Store: Optum's IdP (`uhg.stage.myuhc` on staging) posts an IdP-initiated SAML response to user-api's registered assertion address. `/saml/uhc` produces the same message so app-gateway's Every Mother provider (SYS-20903) can be built and tested before UHC provides a staging test member (SYS-21234).
+
+What it posts:
+
+- A signed, unencrypted response: the Response and the Assertion are both signed with this instance's key pair.
+- Issuer `uhg.stage.myuhc`; NameID format unspecified, carrying the member's EFID; Optum's eleven attributes (`VID`, `TransactionType`, `Email`, `SubscriptionStatus`, `FirstName`, `DOB`, `ProductID`, `LastName`, `ProgramType`, `UHC_Source_App`, `OrderItemID`).
+- `Audience` fixed to `https://user-api.staging.every-mother.com/v1/saml/metadata`, and `Destination` and `Recipient` fixed to `https://user-api.staging.every-mother.com/v1/saml/acs`, whatever address the form posts to. Those are the values Optum's assertion carries through the relay, and app-gateway checks them.
+- No `InResponseTo` (there is no AuthnRequest), and no `RelayState` unless the page was opened with `?relayState=`.
+- A blank attribute field is left out of the assertion, so app-gateway's 422 path can be exercised. "Sign with a throwaway key" signs with a fresh key while still declaring this instance's certificate; app-gateway must refuse it.
+
+Defaults: `ProductID=202642_Annual` (user-api's staging plan), `TransactionType=New`, `SubscriptionStatus=Active`, UUID `OrderItemID` and `VID`. `DOB`, `ProgramType` and `UHC_Source_App` are placeholders (no Optum sample observed; user-api ignores them).
+
+### Outcome presets
+
+The presets differ only in the EFID and email sent. The first, second and fourth need matching records in the target environment.
+
+| Preset                         | EFID / email                                              | Needs in the target environment                                              | app-gateway answers                                    |
+| ------------------------------ | --------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Linked member in good standing | `MOCKUHC-LINKED` / `uhc-mock+linked@wildflowerhealth.com` | An account linked to that EFID with an active UHC subscription               | 303 with `token`                                       |
+| Account to link                | fresh / `uhc-mock+link@wildflowerhealth.com`              | An account with that email, no UHC link, no active subscription              | 303 with `pending_link_id`                             |
+| New member                     | fresh / fresh                                             | Nothing                                                                      | 303 with `pending_saml_id` and `is_new_user=1`         |
+| Member paying elsewhere        | fresh / `uhc-mock+other-platform@wildflowerhealth.com`    | An account with that email and an active app-store or Chargebee subscription | 303 with `error=active_membership_with_other_platform` |
+
+### Where the mock is trusted
+
+Only local, dev and stage trust this mock. app-gateway reads `config/data/saml/meta/<NODE_ENV>/uhcMetadata.xml`, and `WFH_ENV` maps local → `dev`, dev → `test`, stage → `staging`:
+
+| WFH_ENV   | app-gateway file            | Signing certificates                                       | Use                                                             |
+| --------- | --------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------- |
+| local     | `meta/dev/uhcMetadata.xml`  | this repo's `public.crt` (the local mock)                  | a local mock-saml posting to a local app-gateway                |
+| dev       | `meta/test/...`             | the deployed mock (`sso-saml.wfh-test.net`)                | the deployed `/saml/uhc` posting to dev's app-gateway           |
+| stage     | `meta/staging/...`          | the deployed mock, and UHG's real staging cert             | the deployed `/saml/uhc`, or a real `stage-sso.optum.com` login |
+| iat       | `meta/iat/...`              | UHG's real staging cert only                               | Optum's staging IdP                                             |
+| uat, prod | `meta/{uat,production}/...` | UHG's real certs only (staging on uat, production on prod) | Optum's IdP; never the mock                                     |
+
+Each file is Optum's staging metadata with the certificates swapped. Generate it from the instance whose key should be trusted: `GET /api/saml/metadata-uhc?download` (local from `localhost:4123`, dev from `sso-saml.wfh-test.net`), adding `&withOptumStaging` for stage's file.
 
 ## Scripts
 

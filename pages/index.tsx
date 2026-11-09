@@ -8,7 +8,7 @@ const Home: React.FC = () => {
         <h1 className='text-center text-xl font-extrabold text-gray-900 md:text-2xl'>
           Mock Identity Providers
         </h1>
-        <div className='grid grid-cols-1 gap-5 md:grid-cols-3'>
+        <div className='grid grid-cols-1 gap-5 md:grid-cols-2'>
           <div className='border-2 p-5'>
             <h2 className='mb-3 text-center text-2xl font-bold text-gray-900'>Mock Sydney SSO</h2>
             <p className='mb-4 text-center text-sm text-gray-600'>
@@ -28,6 +28,17 @@ const Home: React.FC = () => {
             <div className='flex justify-center'>
               <Link href='/saml/elevance' className='btn-outline btn-primary btn'>
                 Test Elevance Login
+              </Link>
+            </div>
+          </div>
+          <div className='border-2 p-5'>
+            <h2 className='mb-3 text-center text-2xl font-bold text-gray-900'>Mock UHC SSO</h2>
+            <p className='mb-4 text-center text-sm text-gray-600'>
+              Every Mother&apos;s UHC sign-in (Optum PingFederate). Local, dev and stage only.
+            </p>
+            <div className='flex justify-center'>
+              <Link href='/saml/uhc' className='btn-outline btn-primary btn'>
+                Test UHC Login
               </Link>
             </div>
           </div>
