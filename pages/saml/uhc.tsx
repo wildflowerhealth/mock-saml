@@ -11,6 +11,8 @@ type UhcFormData = UhcUserAttributes & {
   acsUrl: string;
   efid: string;
   signWithThrowawayKey: boolean;
+  /** SYS-20903: the mock UHC eligibility API answers this sign-in's order inactive */
+  orderInactive: boolean;
 };
 
 type PresetKey = 'linked' | 'link' | 'new' | 'otherPlatform';
@@ -102,6 +104,7 @@ export default function Uhc() {
     UHC_Source_App: 'UHCStore',
     OrderItemID: '',
     signWithThrowawayKey: false,
+    orderInactive: false,
   });
   const [activePreset, setActivePreset] = useState<PresetKey>('new');
   const [jsonText, setJsonText] = useState('');
@@ -316,8 +319,9 @@ export default function Uhc() {
                     ))}
                   </div>
                   <p className='text-xs text-gray-600'>
-                    A blank attribute is left out of the assertion, as a missing attribute arrives from Optum;
-                    app-gateway should answer 422.
+                    A blank attribute is left out of the assertion, as a missing attribute arrives from Optum.
+                    Without Email, app-gateway answers error=email_missing; the others are optional, as for
+                    user-api.
                   </p>
 
                   <label className='label cursor-pointer justify-start gap-3'>
@@ -329,6 +333,20 @@ export default function Uhc() {
                       onChange={handleChange}
                     />
                     <span className='label-text'>Sign with a throwaway key (app-gateway must refuse it)</span>
+                  </label>
+
+                  <label className='label cursor-pointer justify-start gap-3'>
+                    <input
+                      type='checkbox'
+                      name='orderInactive'
+                      className='checkbox'
+                      checked={form.orderInactive}
+                      onChange={handleChange}
+                    />
+                    <span className='label-text'>
+                      UHC holds this order inactive (the mock eligibility API at /api/uhc says so; activation
+                      then can&apos;t find the order)
+                    </span>
                   </label>
 
                   <button className='btn btn-primary mt-2 block' disabled={Boolean(jsonError) || submitting}>

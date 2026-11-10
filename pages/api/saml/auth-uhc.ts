@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { UhcUserAttributes } from 'types';
 import { IdentityProvider, ServiceProvider, SamlLib, setSchemaValidator } from 'samlify';
 import { randomId, renderAutoPostForm, samlifyAttrTag } from 'lib/samlify-post';
+import { recordUhcOrder } from 'lib/uhcOrders';
 import {
   UHC_ATTRIBUTE_NAMES,
   UHC_ATTRIBUTE_NAME_FORMAT,
@@ -36,6 +37,8 @@ type UhcAuthRequestBody = Partial<UhcUserAttributes> & {
   efid?: unknown;
   relayState?: unknown;
   signWithThrowawayKey?: unknown;
+  /** SYS-20903: the mock UHC eligibility API answers this order inactive */
+  orderInactive?: unknown;
 };
 
 // A key app-gateway has never seen. The response still declares the mock's certificate,
@@ -142,9 +145,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   );
 
+  // SYS-20903: the order this sign-in names, for the mock UHC eligibility API to hold active
+  const productId = typeof body.ProductID === 'string' ? body.ProductID.trim() : '';
+  const orderItemId = typeof body.OrderItemID === 'string' ? body.OrderItemID.trim() : '';
+  const orderInactive = body.orderInactive === true;
+  if (productId && orderItemId && !orderInactive && !signWithThrowawayKey) {
+    recordUhcOrder(efid, orderItemId, { productId });
+  }
+
   console.log(
     `[mock-uhc] signed response for EFID ${efid} to ${acsUrl}: ${sentAttributes.length} of ${UHC_ATTRIBUTE_NAMES.length} attributes` +
-      (signWithThrowawayKey ? ', throwaway key (expect refusal)' : '')
+      (signWithThrowawayKey ? ', throwaway key (expect refusal)' : '') +
+      (orderInactive ? ', order held inactive' : '')
   );
 
   const html = renderAutoPostForm(
