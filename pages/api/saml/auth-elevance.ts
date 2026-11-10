@@ -6,6 +6,7 @@ import type { ElevanceUserAttributes } from 'types';
 import { IdentityProvider, ServiceProvider, SamlLib, setSchemaValidator } from 'samlify';
 import { getEntityId } from 'lib/entity-id';
 import { getSessionFromReq } from 'lib/session-api';
+import { randomId, renderAutoPostForm, samlifyAttrTag } from 'lib/samlify-post';
 
 // samlify requires a schema validator at startup; passthrough is fine for a mock IdP.
 setSchemaValidator({
@@ -183,52 +184,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const html = renderAutoPostForm(acsUrl, result.context, relayState || '');
   res.setHeader('Content-Type', 'text/html');
   res.send(html);
-}
-
-function randomId(): string {
-  // 16 hex chars; matches SAML ID conventions without pulling in a UUID dep.
-  return Array.from({ length: 16 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-}
-
-// Mirrors samlify's internal `tagging('attr', valueTag)` from libsaml.js. The
-// loginResponseTemplate.attributes processor emits placeholders shaped by this
-// rule (e.g. `ProxyID` → `{attrProxyId}`), so customTagReplacement keys must
-// match exactly. Re-implementing locally because samlify doesn't export it.
-function samlifyCamelCase(input: string): string {
-  const words = input
-    .replace(/([a-z\d])([A-Z])/g, '$1\0$2')
-    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1\0$2')
-    .split(/[\0\s\-_.]+/)
-    .filter((w) => w.length > 0);
-  return words
-    .map((w, i) => {
-      const lower = w.toLocaleLowerCase('en-US');
-      return i === 0 ? lower : lower.charAt(0).toLocaleUpperCase('en-US') + lower.slice(1);
-    })
-    .join('');
-}
-
-function samlifyAttrTag(content: string): string {
-  const camel = samlifyCamelCase(content);
-  return 'attr' + camel.charAt(0).toUpperCase() + camel.slice(1);
-}
-
-function escapeAttr(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function renderAutoPostForm(action: string, samlResponseB64: string, relayState: string): string {
-  return `<!DOCTYPE html>
-<html><body>
-  <form id="saml-form" method="POST" action="${escapeAttr(action)}">
-    <input type="hidden" name="SAMLResponse" value="${escapeAttr(samlResponseB64)}" />
-    <input type="hidden" name="RelayState" value="${escapeAttr(relayState)}" />
-  </form>
-  <script>document.getElementById('saml-form').submit();</script>
-</body></html>`;
 }

@@ -55,3 +55,20 @@ export type SydneyUserAttributes = {
 // outbound attribute names. Kept as a distinct type so the eventual
 // divergence is a one-file change rather than a search-and-replace.
 export type ElevanceUserAttributes = SydneyUserAttributes;
+
+// Optum's eleven attributes for Every Mother's UHC sign-in, named exactly as Optum's
+// staging IdP metadata (uhg.stage.myuhc) declares them. The member's EFID travels as
+// the NameID, not as an attribute.
+export type UhcUserAttributes = {
+  VID: string;
+  TransactionType: string;
+  Email: string;
+  SubscriptionStatus: string;
+  FirstName: string;
+  DOB: string;
+  ProductID: string;
+  LastName: string;
+  ProgramType: string;
+  UHC_Source_App: string;
+  OrderItemID: string;
+};
