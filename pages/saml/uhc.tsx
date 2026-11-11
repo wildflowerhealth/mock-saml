@@ -344,8 +344,8 @@ export default function Uhc() {
                       onChange={handleChange}
                     />
                     <span className='label-text'>
-                      UHC holds this order inactive (the mock eligibility API at /api/uhc says so; activation
-                      then can&apos;t find the order)
+                      UHC holds this order inactive (the OrderItemID is signed as INACTIVE-…, which the mock
+                      eligibility API at /api/uhc answers inactive; activation then can&apos;t find the order)
                     </span>
                   </label>
 

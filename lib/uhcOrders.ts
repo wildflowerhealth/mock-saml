@@ -1,35 +1,25 @@
 /**
- * The UHC Store orders the mock UHC page has signed, for the mock UHC eligibility API
- * (pages/api/uhc). app-gateway's UHC sign-in confirms an order with UHC's eligibility API
- * before activation, as user-api did (SYS-20903); UHC's real API knows nothing of the mock's
- * members, so local, dev and stage point at this one instead.
+ * How the mock UHC eligibility API (pages/api/uhc) answers, with nothing remembered (SYS-20903).
+ * Wildflower confirms a UHC member's order with UHC's eligibility API before activation, as
+ * user-api did, and asks again at activation, on the portal's re-fetch and at the end of each
+ * year it grants. UHC's real API knows nothing of the mock's members, so local, dev and stage
+ * point at this one instead.
  *
- * Held on globalThis: Next.js bundles each API route on its own, and the page's sign-in and
- * the eligibility call are two routes in one process. In memory only, for as long as a pending
- * sign-in lasts (48 hours), so a restart forgets them and a launch signs a fresh one.
+ * Every order is active except one whose OrderItemID carries {@link INACTIVE_ORDER_PREFIX}, which
+ * the UHC page's "UHC holds this order inactive" signs into the assertion. Nothing is held in
+ * memory, so the answer survives a restart or a deploy and stays the same for the whole year
+ * Wildflower grants.
  */
-export type UhcOrder = { productId: string };
+export const INACTIVE_ORDER_PREFIX = 'INACTIVE-';
 
-const HOLD_MS = 48 * 60 * 60 * 1000;
-
-type Held = { order: UhcOrder; until: number };
-const globalOrders = globalThis as typeof globalThis & { __mockUhcOrders?: Map<string, Held> };
-const orders = (globalOrders.__mockUhcOrders ??= new Map<string, Held>());
-
-const key = (efid: string, orderItemId: string) => `${efid}\u0000${orderItemId}`;
-
-/** An order the mock signed, which UHC is to hold active. */
-export function recordUhcOrder(efid: string, orderItemId: string, order: UhcOrder): void {
-  orders.set(key(efid, orderItemId), { order, until: Date.now() + HOLD_MS });
-}
-
-/** The active order for this member and order item, if the mock signed one. */
-export function activeUhcOrder(efid: string, orderItemId: string): UhcOrder | undefined {
-  const held = orders.get(key(efid, orderItemId));
-  if (!held) return undefined;
-  if (held.until < Date.now()) {
-    orders.delete(key(efid, orderItemId));
-    return undefined;
+/** The OrderItemID to sign: marked inactive when UHC is to hold the order inactive. */
+export function orderItemIdToSign(orderItemId: string, inactive: boolean): string {
+  if (!inactive || orderItemId.trim() === '' || orderItemId.startsWith(INACTIVE_ORDER_PREFIX)) {
+    return orderItemId;
   }
-  return held.order;
+  return `${INACTIVE_ORDER_PREFIX}${orderItemId}`;
 }
+
+/** Whether UHC holds this order active: any order but one signed inactive. */
+export const isUhcOrderActive = (orderItemId: string): boolean =>
+  !orderItemId.startsWith(INACTIVE_ORDER_PREFIX);

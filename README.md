@@ -65,10 +65,10 @@ Each file is Optum's staging metadata with the certificates swapped. Generate it
 
 Before activation, the member site asks whether UHC holds the member's order active. As user-api did, Wildflower reads its ledger first and then asks UHC's eligibility API (SYS-20903). UHC's real API knows nothing of the mock's members, so the mock serves one in UHC's shape:
 
-| Endpoint                              | Answers                                                                                                                                                         |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `POST /api/uhc/oauth/token`           | A client-credentials token, to any client                                                                                                                       |
-| `POST /api/uhc/hub/1.0.0/eligibility` | `IS_ACTIVE: true` for an order (EFID and `OrderItemID`) the UHC page signed in the last 48 hours, unless it was launched with **UHC holds this order inactive** |
+| Endpoint                              | Answers                                                                                                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /api/uhc/oauth/token`           | A client-credentials token, to any client                                                                                                   |
+| `POST /api/uhc/hub/1.0.0/eligibility` | `IS_ACTIVE: true` for every order except one launched with **UHC holds this order inactive**, which signs its `OrderItemID` as `INACTIVE-…` |
 
 Point portal-facade at it with its `EM_UHC_API_*` settings, for example locally in the monorepo's root `.env`:
 
@@ -81,7 +81,7 @@ EM_UHC_ELIGIBILITY_SCOPE=eligibility
 EM_UHC_UPSTREAM_ENV=local
 ```
 
-The signed orders are held in memory, so a restart forgets them: launch the sign-in again.
+The mock remembers nothing: the answer comes from the `OrderItemID` alone, so it survives a restart or a deploy and stays the same for the year Wildflower grants. An order the mock never signed is active too.
 
 ## Scripts
 
