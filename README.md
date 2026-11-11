@@ -61,6 +61,28 @@ Only local, dev and stage trust this mock. app-gateway reads `config/data/saml/m
 
 Each file is Optum's staging metadata with the certificates swapped. Generate it from the instance whose key should be trusted: `GET /api/saml/metadata-uhc?download` (local from `localhost:4123`, dev from `sso-saml.wfh-test.net`), adding `&withOptumStaging` for stage's file.
 
+### Mock UHC eligibility API
+
+Before activation, the member site asks whether UHC holds the member's order active. As user-api did, Wildflower reads its ledger first and then asks UHC's eligibility API (SYS-20903). UHC's real API knows nothing of the mock's members, so the mock serves one in UHC's shape:
+
+| Endpoint                              | Answers                                                                                                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /api/uhc/oauth/token`           | A client-credentials token, to any client                                                                                                   |
+| `POST /api/uhc/hub/1.0.0/eligibility` | `IS_ACTIVE: true` for every order except one launched with **UHC holds this order inactive**, which signs its `OrderItemID` as `INACTIVE-…` |
+
+Point portal-facade at it with its `EM_UHC_API_*` settings, for example locally in the monorepo's root `.env`:
+
+```
+EM_UHC_API_URL=http://localhost:4123/api/uhc
+EM_UHC_API_TOKEN_URL=http://localhost:4123/api/uhc/oauth/token
+EM_UHC_API_CLIENT_ID=mock-saml
+EM_UHC_API_CLIENT_SECRET=mock-saml-local
+EM_UHC_ELIGIBILITY_SCOPE=eligibility
+EM_UHC_UPSTREAM_ENV=local
+```
+
+The mock remembers nothing: the answer comes from the `OrderItemID` alone, so it survives a restart or a deploy and stays the same for the year Wildflower grants. An order the mock never signed is active too.
+
 ## Scripts
 
 | Command                | Description                                                       |

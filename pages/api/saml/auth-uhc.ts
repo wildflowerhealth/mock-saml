@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { UhcUserAttributes } from 'types';
 import { IdentityProvider, ServiceProvider, SamlLib, setSchemaValidator } from 'samlify';
 import { randomId, renderAutoPostForm, samlifyAttrTag } from 'lib/samlify-post';
+import { orderItemIdToSign } from 'lib/uhcOrders';
 import {
   UHC_ATTRIBUTE_NAMES,
   UHC_ATTRIBUTE_NAME_FORMAT,
@@ -36,6 +37,8 @@ type UhcAuthRequestBody = Partial<UhcUserAttributes> & {
   efid?: unknown;
   relayState?: unknown;
   signWithThrowawayKey?: unknown;
+  /** SYS-20903: the mock UHC eligibility API answers this order inactive */
+  orderInactive?: unknown;
 };
 
 // A key app-gateway has never seen. The response still declares the mock's certificate,
@@ -59,11 +62,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).send('acsUrl and efid are required');
   }
   const signWithThrowawayKey = body.signWithThrowawayKey === true;
+  // SYS-20903: an order UHC is to hold inactive carries the mark in its OrderItemID, the one
+  // thing the mock eligibility API is asked about, so the mock remembers nothing
+  const orderInactive = body.orderInactive === true;
+  const attributeValue = (name: keyof UhcUserAttributes): unknown => {
+    const value = body[name];
+    return name === 'OrderItemID' && typeof value === 'string'
+      ? orderItemIdToSign(value, orderInactive)
+      : value;
+  };
 
   // A blank field is left out of the assertion entirely, the way a missing attribute
-  // arrives from Optum, so app-gateway's 422 path can be exercised.
+  // arrives from Optum, so app-gateway's handling of each one can be exercised.
   const sentAttributes = UHC_ATTRIBUTE_NAMES.filter((name) => {
-    const value = body[name];
+    const value = attributeValue(name);
     return typeof value === 'string' && value.trim() !== '';
   });
 
@@ -126,7 +138,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     SessionIndex: `_${randomId()}`,
   };
   for (const name of sentAttributes) {
-    tagValues[samlifyAttrTag(name)] = body[name];
+    const value = attributeValue(name);
+    tagValues[samlifyAttrTag(name)] = typeof value === 'string' ? value : undefined;
   }
 
   const result = await idp.createLoginResponse(
@@ -144,7 +157,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   console.log(
     `[mock-uhc] signed response for EFID ${efid} to ${acsUrl}: ${sentAttributes.length} of ${UHC_ATTRIBUTE_NAMES.length} attributes` +
-      (signWithThrowawayKey ? ', throwaway key (expect refusal)' : '')
+      (signWithThrowawayKey ? ', throwaway key (expect refusal)' : '') +
+      (orderInactive ? ', order held inactive' : '')
   );
 
   const html = renderAutoPostForm(
